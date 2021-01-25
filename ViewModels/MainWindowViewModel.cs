@@ -9,9 +9,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CeoSeoCommon;
+using HtmlAgilityPack;
 using HTMLXaml;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,19 +58,9 @@ namespace CeoSeoViewModels
                 .Where(x => x != null)
                 .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.DoGoogleSearch);
-
-            this.WhenAnyValue(vm => vm.Html)
-               .Where(x => x != null)
-               .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
-               .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(this.BuildXamlFlowDocmentFromHtml);
+                .Subscribe(this.GetViaWebClient);
         }
 
-        private void BuildXamlFlowDocmentFromHtml(string rawHtml)
-        {
-            FlowDocumentXamlString = HtmlToXamlConverter.ConvertHtmlToXaml(rawHtml, true);
-        }
         public string Html
         {
             get { return html; }
@@ -78,18 +71,30 @@ namespace CeoSeoViewModels
             }
         }
 
-        public string FlowDocumentXamlString
+        private void GetViaWebClient(string query)
         {
-            get
+            var returnStrings = new List<string>();
+            string Url = "http://www.google.com/search?num=100&q=" + query.Replace(" ","+") ; // conveyancing+software";
+
+            var result = new HtmlWeb().Load(Url);
+            var nodes = result.DocumentNode.SelectNodes("//html//body//div[@class='g']");
+
+            if (nodes != null)
             {
-                return this.flowDocumentXamlString;
+                foreach (HtmlNode oneNode in nodes)
+                {
+                    var nodeContent = oneNode.InnerText;
+                    returnStrings.Add(nodeContent);
+                }
+
+                if (returnStrings.Count > 0)
+                {
+
+                }
             }
 
-            set
-            {
-                this.flowDocumentXamlString = value;
-                this.OnPropertyChanged("FlowDocumentXamlString");
-            }
+   
+
         }
 
         private void DoGoogleSearch(string obj)

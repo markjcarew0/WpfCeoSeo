@@ -13,10 +13,9 @@
         FontSize="16"
         Title="Ceo Seo Google Hits"
         WindowStartupLocation="CenterScreen"
-        SizeToContent="WidthAndHeight"
-        MinHeight="800"
+        Height="800"
         Loaded="Window_Loaded"
-        MinWidth="800">
+        Width="800">
     <Window.DataContext>
         <ceoseoviewmodels1:MainWindowViewModel />
     </Window.DataContext>
@@ -70,16 +69,6 @@
                  Grid.Column="01"
                  VerticalContentAlignment="Center"
                  Margin="10" />
-        <Button Grid.Row="02"
-                Click="Button_Click"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Grid.ColumnSpan="02"
-                Margin="0,0,0,12">
-            <TextBox Text="Press Me"
-                     Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
-                     BorderThickness="0" />
-        </Button>
         <!--<wpf:WebView2
             x:Name="WebViewControl"
             Grid.Row="01"
@@ -98,6 +87,18 @@
                                   BorderThickness="0"
                                   Document="{Binding Path=FlowDocumentXamlString, UpdateSourceTrigger=PropertyChanged,
             Converter={StaticResource XAMLToFlowDocument }}" />
+
+        <Button Grid.Row="02"
+                Click="Button_Click"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Grid.ColumnSpan="02"
+                Margin="0,0,0,12">
+            <TextBox Text="Press Me"
+                     Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                     BorderThickness="0" />
+        </Button>
+
 
         <!--<Viewbox Height="30"
                  Grid.Row="00"

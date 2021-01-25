@@ -5,12 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:CeoSeoViewModels;assembly=CeoSeoViewModels"
         xmlns:wpfceoseo="clr-namespace:WpfCeoSeo"
+        xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Background="AliceBlue"
         mc:Ignorable="d"
         FontSize="16"
         Title="Ceo Seo Google Hits"
-        Height="450"
-        Width="800">
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        MinHeight="800"
+        Loaded="Window_Loaded"
+        MinWidth="800">
     <Window.DataContext>
         <viewmodels:MainWindowViewModel />
     </Window.DataContext>
@@ -72,8 +76,18 @@
                      Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
                      BorderThickness="0" />
         </Button>
+        <!--<wpf:WebView2
+            x:Name="WebViewControl"
+            Grid.Row="01"
+                      Grid.Column="00"
+                      Grid.ColumnSpan="02">-->
+            
+        <!--</wpf:WebView2>-->
+        <DataGrid  Grid.Row="01"
+                   Grid.Column="00"
+                   Grid.ColumnSpan="02" />
 
-        <Viewbox Height="20"
+        <Viewbox Height="30"
                  Grid.Row="00"
                  Grid.RowSpan="03"
                  Grid.ColumnSpan="02">

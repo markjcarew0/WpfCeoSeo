@@ -16,5 +16,10 @@ namespace WpfCeoSeo
         {
             this.Close();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // WebViewControl.EnsureCoreWebView2Async().GetAwaiter().GetResult();;
+        }
     }
 }

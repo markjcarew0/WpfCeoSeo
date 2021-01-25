@@ -73,8 +73,9 @@
                      BorderThickness="0" />
         </Button>
 
-        <Viewbox Height="100"
-                 Grid.Row="03"
+        <Viewbox Height="20"
+                 Grid.Row="00"
+                 Grid.RowSpan="03"
                  Grid.ColumnSpan="02">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
         </Viewbox>

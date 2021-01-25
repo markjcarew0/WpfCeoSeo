@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LoadingWaitView.xaml.cs" company="MarkJC">
-//   Author Mark Carew - from a work by Sacha Barber
+//   Author Mark Carew - from a work by Sacha Barber - changed
 // </copyright>
 // <summary>
 //   Interaction logic for LoadingWait.xaml

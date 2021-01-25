@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataTransferObjects\DataTransferObjects.csproj" />
+    <ProjectReference Include="..\HtmlXaml\HtmlToXaml.csproj" />
     <ProjectReference Include="..\WpfCommon\CeoSeoCommon.csproj" />
   </ItemGroup>
 

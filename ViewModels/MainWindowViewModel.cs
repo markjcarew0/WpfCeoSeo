@@ -9,10 +9,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CeoSeoCommon;
+using HTMLXaml;
 using ReactiveUI;
 using System;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Windows.Markup;
+using System.Windows.Threading;
 
 namespace CeoSeoViewModels
 {
@@ -28,6 +33,12 @@ namespace CeoSeoViewModels
         ///     sync context tied to mainline
         /// </summary>
         private readonly TaskScheduler synchronisationContext;
+
+        private string html;
+
+        private bool searchSpinnerOn;
+
+        private string flowDocumentXamlString;
 
         /// <summary>
         /// constructor for MainWindowViewModel
@@ -50,45 +61,36 @@ namespace CeoSeoViewModels
                .Where(x => x != null)
                .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
                .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(this.BuildUriHtml);
-
+               .Subscribe(this.BuildXamlFlowDocmentFromHtml);
         }
 
-        private void BuildUriHtml(string obj)
+        private void BuildXamlFlowDocmentFromHtml(string rawHtml)
         {
-            // UriHtml = Path.Combine(Environment.CurrentDirectory, /)
-            UriHtml = new Uri("https://youtube.com");
+            FlowDocumentXamlString = HtmlToXamlConverter.ConvertHtmlToXaml(rawHtml, true);
         }
-
-        private string html;
-
         public string Html
         {
             get { return html; }
             set
-            { 
+            {
                 html = value;
                 this.OnPropertyChanged(nameof(Html));
             }
         }
 
-        private Uri uriHtml;
-
-        public Uri UriHtml
+        public string FlowDocumentXamlString
         {
-            get 
+            get
             {
-                return uriHtml;
+                return this.flowDocumentXamlString;
             }
 
-            set 
+            set
             {
-                uriHtml = value;
-                this.OnPropertyChanged(nameof(UriHtml));
+                this.flowDocumentXamlString = value;
+                this.OnPropertyChanged("FlowDocumentXamlString");
             }
         }
-
-
 
         private void DoGoogleSearch(string obj)
         {
@@ -129,13 +131,12 @@ namespace CeoSeoViewModels
             }
         }
 
-        private bool searchSpinnerOn;
 
         public bool SearchSpinnerOn
         {
-            get 
+            get
             {
-                return searchSpinnerOn; 
+                return searchSpinnerOn;
             }
 
             set

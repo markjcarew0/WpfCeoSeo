@@ -19,7 +19,6 @@ namespace CeoSeoDataAccess
             var data = webClient.DownloadString(uriString);
 
             return data;
-
         }
     }
 }

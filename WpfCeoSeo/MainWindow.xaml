@@ -7,6 +7,7 @@
         xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:ceoseoviewmodels="clr-namespace:CeoSeoViewModels"
         xmlns:ceoseoviewmodels1="clr-namespace:CeoSeoViewModels;assembly=CeoSeoViewModels"
+        xmlns:htmlxaml="clr-namespace:HTMLXaml;assembly=HtmlToXaml"
         Background="AliceBlue"
         mc:Ignorable="d"
         FontSize="16"
@@ -20,8 +21,10 @@
         <ceoseoviewmodels1:MainWindowViewModel />
     </Window.DataContext>
     <Window.Resources>
+
+        <htmlxaml:XAMLToFlowDocumentConverter x:Key="XAMLToFlowDocument" />
         <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
-                                                       DefaultHideMethod="Hidden" />
+                                                              DefaultHideMethod="Hidden" />
         <Style TargetType="Button">
             <Style.Setters>
                 <Setter Property="Opacity"
@@ -82,17 +85,25 @@
             Grid.Row="01"
                       Grid.Column="00"
                       Grid.ColumnSpan="02">-->
-            
-        <!--</wpf:WebView2>-->
-        <DataGrid  Grid.Row="01"
-                   Grid.Column="00"
-                   Grid.ColumnSpan="02" />
 
-        <Viewbox Height="30"
+        <!--</wpf:WebView2>-->
+        <!--<FlowDocument  Grid.Row="01"
+                   Grid.Column="00"
+                   Grid.ColumnSpan="02" />-->
+        <FlowDocumentReader Grid.Row="01"
+                                  Grid.Column="00"
+                                  Grid.ColumnSpan="02"
+                                  Width="600"
+                                  BorderBrush="White"
+                                  BorderThickness="0"
+                                  Document="{Binding Path=FlowDocumentXamlString, UpdateSourceTrigger=PropertyChanged,
+            Converter={StaticResource XAMLToFlowDocument }}" />
+
+        <!--<Viewbox Height="30"
                  Grid.Row="00"
                  Grid.RowSpan="03"
                  Grid.ColumnSpan="02">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
-        </Viewbox>
+        </Viewbox>-->
     </Grid>
 </Window>

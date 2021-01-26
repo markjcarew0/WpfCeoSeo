@@ -159,15 +159,17 @@
                   CellStyle="{StaticResource PaddedDataGridCell}"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">
+            <!--<DataGrid.RowStyle>-->
             <!--<Style TargetType="{x:Type DataGridRow}">
-                --><!--<Style.Triggers>
+                <Style.Triggers>
                     <DataTrigger Binding="{Binding Path=IsSmokeBall}"
                                  Value="True">
                         <Setter Property="Background"
                                 Value="HotPink" />
                     </DataTrigger>
-                </Style.Triggers>--><!--
-            </Style>-->
+                </Style.Triggers>
+            </Style>
+                </DataGrid.RowStyle>-->
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="45"
                                         Header="Rank">

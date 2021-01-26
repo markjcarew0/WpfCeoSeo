@@ -4,10 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wpfceoseo="clr-namespace:WpfCeoSeo"
-        xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        xmlns:ceoseoviewmodels="clr-namespace:CeoSeoViewModels"
         xmlns:ceoseoviewmodels1="clr-namespace:CeoSeoViewModels;assembly=CeoSeoViewModels"
-        xmlns:htmlxaml="clr-namespace:HTMLXaml;assembly=HtmlToXaml"
         Background="AliceBlue"
         mc:Ignorable="d"
         FontSize="16"
@@ -15,15 +12,99 @@
         WindowStartupLocation="CenterScreen"
         Height="800"
         Loaded="Window_Loaded"
-        Width="800">
+        Width="1200">
     <Window.DataContext>
         <ceoseoviewmodels1:MainWindowViewModel />
     </Window.DataContext>
     <Window.Resources>
-
-        <htmlxaml:XAMLToFlowDocumentConverter x:Key="XAMLToFlowDocument" />
         <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
                                                               DefaultHideMethod="Hidden" />
+        <!-- Datagrid styles -->
+        <Style x:Key="PaddedDataGridCell"
+               TargetType="{x:Type DataGridCell}">
+            <Setter Property="Padding"
+                    Value="5 3" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Border  Padding="{TemplateBinding Padding}"
+                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                 Background="{TemplateBinding Background}"
+                                 SnapsToDevicePixels="True">
+                            <Border VerticalAlignment="Center">
+                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}" />
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}"
+                                   Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}, Path=IsKeyboardFocusWithin}"
+                                   Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        <Setter Property="Foreground"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StandardDataGrid"
+               TargetType="{x:Type DataGrid}">
+            <Setter Property="AutoGenerateColumns"
+                    Value="False" />
+            <Setter Property="HeadersVisibility"
+                    Value="Column" />
+            <Setter Property="CanUserAddRows"
+                    Value=" False" />
+            <Setter Property="CanUserDeleteRows"
+                    Value=" False" />
+            <Setter Property="IsReadOnly"
+                    Value=" True" />
+            <Setter Property="GridLinesVisibility"
+                    Value=" None" />
+            <Setter Property="AlternatingRowBackground"
+                    Value="PaleGoldenrod" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="SelectionUnit"
+                    Value="FullRow" />
+            <Setter Property="IsSynchronizedWithCurrentItem"
+                    Value="True" />
+            <Setter Property="EnableRowVirtualization"
+                    Value="True" />
+            <Setter Property="CanUserReorderColumns"
+                    Value="False" />
+            <Setter Property="CanUserResizeColumns"
+                    Value="False" />
+            <Setter Property="SelectionMode"
+                    Value="Single" />
+        </Style>
+        <!-- other sytles -->
         <Style TargetType="Button">
             <Style.Setters>
                 <Setter Property="Opacity"
@@ -69,24 +150,56 @@
                  Grid.Column="01"
                  VerticalContentAlignment="Center"
                  Margin="10" />
-        <!--<wpf:WebView2
-            x:Name="WebViewControl"
-            Grid.Row="01"
-                      Grid.Column="00"
-                      Grid.ColumnSpan="02">-->
 
-        <!--</wpf:WebView2>-->
-        <!--<FlowDocument  Grid.Row="01"
-                   Grid.Column="00"
-                   Grid.ColumnSpan="02" />-->
-        <FlowDocumentReader Grid.Row="01"
-                                  Grid.Column="00"
-                                  Grid.ColumnSpan="02"
-                                  Width="600"
-                                  BorderBrush="White"
-                                  BorderThickness="0"
-                                  Document="{Binding Path=FlowDocumentXamlString, UpdateSourceTrigger=PropertyChanged,
-            Converter={StaticResource XAMLToFlowDocument }}" />
+        <DataGrid x:Name="DataDatagrid"
+                  Grid.Row="01"
+                  Grid.ColumnSpan="02"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ItemsSource="{Binding Path=Source, UpdateSourceTrigger=PropertyChanged}"
+                  CellStyle="{StaticResource PaddedDataGridCell}"
+                  Style="{StaticResource StandardDataGrid}"
+                  ColumnWidth="Auto">
+            <!--<Style TargetType="{x:Type DataGridRow}">
+                --><!--<Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=IsSmokeBall}"
+                                 Value="True">
+                        <Setter Property="Background"
+                                Value="HotPink" />
+                    </DataTrigger>
+                </Style.Triggers>--><!--
+            </Style>-->
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="45"
+                                        Header="Rank">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=QueryPosition}"
+                                       Padding="2" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="*"
+                                        Header="Data">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=FoundData}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Padding="2"
+                                       TextAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="45"
+                                        Header="Dispensed">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=IsSmokeBall}"
+                                       Padding="2" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
         <Button Grid.Row="02"
                 Click="Button_Click"
@@ -98,13 +211,11 @@
                      Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
                      BorderThickness="0" />
         </Button>
-
-
-        <!--<Viewbox Height="30"
+        <Viewbox Height="30"
                  Grid.Row="00"
                  Grid.RowSpan="03"
                  Grid.ColumnSpan="02">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
-        </Viewbox>-->
+        </Viewbox>
     </Grid>
 </Window>

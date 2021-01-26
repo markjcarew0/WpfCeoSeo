@@ -9,22 +9,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using CeoSeoCommon;
+using DataTransferObjects;
+using DynamicData;
+using DynamicData.Binding;
 using HtmlAgilityPack;
-using HTMLXaml;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Net;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Markup;
-using System.Windows.Threading;
 
 namespace CeoSeoViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ReactiveObject
     {
         /// <summary>
         /// private backing field 
@@ -37,87 +35,83 @@ namespace CeoSeoViewModels
         /// </summary>
         private readonly TaskScheduler synchronisationContext;
 
-        private string html;
-
+        /// <summary>
+        /// private backing field
+        /// for public Property SearchSpinnerOn 
+        /// </summary>
         private bool searchSpinnerOn;
-
-        private string flowDocumentXamlString;
 
         /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
         public MainWindowViewModel()
         {
+            this.Source = new ObservableCollectionExtended<GoogleSearchData>();
+
+            this.Source.ToObservableChangeSet()
+                .Bind(out this.details)
+                .Subscribe();
+
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
             this.QuerySearchString = "conveyancing software";
 
             var scheduler = RxApp.MainThreadScheduler;
+
+            // turn off the spinner wait control by default
             this.SearchSpinnerOn = false;
+
             this.WhenAnyValue(vm => vm.QuerySearchString)
                 .Where(x => x != null)
                 .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.GetViaWebClient);
+                .ObserveOn(scheduler)
+                .Subscribe(this.GetQueryResultData);
         }
 
-        public string Html
+        private void GetQueryResultData(string query)
         {
-            get { return html; }
-            set
-            {
-                html = value;
-                this.OnPropertyChanged(nameof(Html));
-            }
-        }
+            // turn on the spinner wait control showing that earch action is being executed
+            this.SearchSpinnerOn = true;
 
-        private void GetViaWebClient(string query)
-        {
-            var returnStrings = new List<string>();
-            string Url = "http://www.google.com/search?num=100&q=" + query.Replace(" ","+") ; // conveyancing+software";
-
-            var result = new HtmlWeb().Load(Url);
-            var nodes = result.DocumentNode.SelectNodes("//html//body//div[@class='g']");
-
-            if (nodes != null)
-            {
-                foreach (HtmlNode oneNode in nodes)
-                {
-                    var nodeContent = oneNode.InnerText;
-                    returnStrings.Add(nodeContent);
-                }
-
-                if (returnStrings.Count > 0)
-                {
-
-                }
-            }
-
-   
-
-        }
-
-        private void DoGoogleSearch(string obj)
-        {
-            // set searching spinner on
-            // and do tas.run search
-            this.SearchSpinnerOn = false;
-
+            // run the search in a task so that we can set the ui 
             Task.Run(
                     () =>
                     {
-                        var result = GoogleDataBroker.GetSearchResponse(this.QuerySearchString);
-                        return result;
+                        return GoogleDataBroker.GetSearchResponse(query);
                     })
                 .ContinueWith(
                     x =>
                     {
-                        this.SearchSpinnerOn = true;
-                        this.Html = x.Result;
+                        this.Source.Clear();
+                        var returnNodesData = new List<GoogleSearchData>();
+                        var positionInList = 0;
+
+                        foreach (HtmlNode oneNode in x.Result)
+                        {
+                            var nodeContent = oneNode.InnerText;
+                            var newLine = new GoogleSearchData
+                            {
+                                FoundData = nodeContent,
+                                IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
+                                QueryPosition = ++positionInList
+                            };
+
+                            returnNodesData.Add(newLine);
+
+                           
+                        }
+                        // turn off the spinner wait control showing that search action is completed
+                        this.SearchSpinnerOn = false;
+                        this.Source.AddRange(returnNodesData);
                     },
                     this.synchronisationContext)
                 .ConfigureAwait(false);
         }
+
+        /// <summary>
+        ///     Gets the source.
+        /// </summary>
+        public ObservableCollectionExtended<GoogleSearchData> Source { get; }
 
         /// <summary>
         /// contains the query string UI entered for the google search 
@@ -131,12 +125,15 @@ namespace CeoSeoViewModels
 
             set
             {
-                this.querySearchString = value;
-                this.OnPropertyChanged(nameof(QuerySearchString));
+                this.RaiseAndSetIfChanged(ref this.querySearchString, value);
             }
         }
 
-
+        /// <summary>
+        /// property that toggles on and off the visibility of 
+        /// the spinner control 
+        /// that indicates that processing activity is going on
+        /// </summary>
         public bool SearchSpinnerOn
         {
             get
@@ -146,10 +143,36 @@ namespace CeoSeoViewModels
 
             set
             {
-                searchSpinnerOn = value;
-                this.OnPropertyChanged(nameof(SearchSpinnerOn));
+                this.RaiseAndSetIfChanged(ref this.searchSpinnerOn, value);
             }
         }
+
+        private List<GoogleSearchData> googleReturnedData;
+
+        public List<GoogleSearchData> GoogleReturnedData
+        {
+            get { return googleReturnedData; }
+            set 
+            {
+                this.RaiseAndSetIfChanged(ref this.googleReturnedData, value);
+            }
+        }
+
+        /// <summary>
+        ///     The details.
+        /// </summary>
+        private ReadOnlyObservableCollection<GoogleSearchData> details;
+
+        /// <summary>
+        ///     Gets or sets the details.
+        /// </summary>
+        public ReadOnlyObservableCollection<GoogleSearchData> Details
+        {
+            get => this.details;
+
+            set => this.RaiseAndSetIfChanged(ref this.details, value);
+        }
+
 
     }
 }

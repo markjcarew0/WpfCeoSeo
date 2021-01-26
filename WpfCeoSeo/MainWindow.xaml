@@ -11,7 +11,6 @@
         Title="Ceo Seo Google Hits"
         WindowStartupLocation="CenterScreen"
         Height="800"
-        Loaded="Window_Loaded"
         Width="1200">
     <Window.DataContext>
         <ceoseoviewmodels1:MainWindowViewModel />
@@ -19,6 +18,10 @@
     <Window.Resources>
         <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
                                                               DefaultHideMethod="Hidden" />
+        <!--<CollectionViewSource x:Key="queryData"
+                              Source="{Binding Source}"
+                              Filter="CollectionViewSource_Filter">-->
+        <!--</CollectionViewSource>-->
         <!-- Datagrid styles -->
         <Style x:Key="PaddedDataGridCell"
                TargetType="{x:Type DataGridCell}">
@@ -140,6 +143,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <TextBlock Text="Google Search string  -:"
                    Grid.Row="00"
@@ -150,17 +154,22 @@
                  Grid.Column="01"
                  VerticalContentAlignment="Center"
                  Margin="10" />
+        <CheckBox IsChecked="{Binding Path=SmokeBallOnly, UpdateSourceTrigger=PropertyChanged}"
+                 Grid.Row="00"
+                 Grid.Column="02"
+                 VerticalContentAlignment="Center"
+                 Margin="10" />
 
         <DataGrid x:Name="DataDatagrid"
                   Grid.Row="01"
-                  Grid.ColumnSpan="02"
+                  Grid.ColumnSpan="03"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding Path=Source, UpdateSourceTrigger=PropertyChanged}"
                   CellStyle="{StaticResource PaddedDataGridCell}"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">
-            <!--<DataGrid.RowStyle>-->
-            <!--<Style TargetType="{x:Type DataGridRow}">
+            <DataGrid.RowStyle>
+            <Style TargetType="{x:Type DataGridRow}">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Path=IsSmokeBall}"
                                  Value="True">
@@ -169,7 +178,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-                </DataGrid.RowStyle>-->
+                </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="45"
                                         Header="Rank">
@@ -207,16 +216,16 @@
                 Click="Button_Click"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                Grid.ColumnSpan="02"
+                Grid.ColumnSpan="03"
                 Margin="0,0,0,12">
             <TextBox Text="Press Me"
                      Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
                      BorderThickness="0" />
         </Button>
-        <Viewbox Height="30"
+        <Viewbox Height="50"
                  Grid.Row="00"
                  Grid.RowSpan="03"
-                 Grid.ColumnSpan="02">
+                 Grid.ColumnSpan="03">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
         </Viewbox>
     </Grid>

@@ -41,31 +41,45 @@ namespace CeoSeoViewModels
         /// </summary>
         private bool searchSpinnerOn;
 
+        private bool smokeBallOnly;
+
         /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
         public MainWindowViewModel()
         {
+            this.SearchSpinnerOn = false;
+            this.SmokeBallOnly = true;
+
+            var scheduler = RxApp.MainThreadScheduler;
+
+            this.WhenAnyValue(vm => vm.QuerySearchString)
+            .Where(x => x != null)
+            .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
+            .ObserveOn(scheduler)
+            .Subscribe(this.GetQueryResultData);
+
+            var observableFilter =
+                this.WhenAnyValue(vm => vm.SmokeBallOnly)
+                 .ObserveOn(scheduler)
+                 .Select(MakeFilter);
+
             this.Source = new ObservableCollectionExtended<GoogleSearchData>();
 
             this.Source.ToObservableChangeSet()
+                .Filter(observableFilter)
+                .ObserveOn(scheduler)
                 .Bind(out this.details)
                 .Subscribe();
 
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
             this.QuerySearchString = "conveyancing software";
+        }
 
-            var scheduler = RxApp.MainThreadScheduler;
-
-            // turn off the spinner wait control by default
-            this.SearchSpinnerOn = false;
-
-            this.WhenAnyValue(vm => vm.QuerySearchString)
-                .Where(x => x != null)
-                .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
-                .ObserveOn(scheduler)
-                .Subscribe(this.GetQueryResultData);
+        private Func<GoogleSearchData, bool> MakeFilter(bool arg)
+        {
+            return vm => vm.IsSmokeBall == arg;
         }
 
         private void GetQueryResultData(string query)
@@ -156,7 +170,7 @@ namespace CeoSeoViewModels
         public List<GoogleSearchData> GoogleReturnedData
         {
             get { return googleReturnedData; }
-            set 
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.googleReturnedData, value);
             }
@@ -176,7 +190,13 @@ namespace CeoSeoViewModels
 
             set => this.RaiseAndSetIfChanged(ref this.details, value);
         }
-
-
+        /// <summary>
+        /// filter to show only smoke ball data
+        /// </summary>
+        public bool SmokeBallOnly
+        {
+            get => smokeBallOnly;
+            set => this.RaiseAndSetIfChanged(ref this.smokeBallOnly, value);
+        }
     }
 }

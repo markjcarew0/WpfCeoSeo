@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using CeoSeoViewModels;
+using DataTransferObjects;
+using System.Windows;
+using System.Windows.Data;
 
 namespace WpfCeoSeo
 {
@@ -7,19 +10,17 @@ namespace WpfCeoSeo
     /// </summary>
     public partial class MainWindow : Window
     {
+        //private MainWindowViewModel viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            // WebViewControl.EnsureCoreWebView2Async().GetAwaiter().GetResult();;
         }
     }
 }

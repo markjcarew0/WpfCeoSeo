@@ -86,23 +86,27 @@ namespace CeoSeoViewModels
                         var returnNodesData = new List<GoogleSearchData>();
                         var positionInList = 0;
 
-                        foreach (HtmlNode oneNode in x.Result)
+
+                        if (x.Result != null)
                         {
-                            var nodeContent = oneNode.InnerText;
-                            var newLine = new GoogleSearchData
+                            foreach (HtmlNode oneNode in x.Result)
                             {
-                                FoundData = nodeContent,
-                                IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
-                                QueryPosition = ++positionInList
-                            };
+                                var nodeContent = oneNode.InnerText;
+                                var newLine = new GoogleSearchData
+                                {
+                                    FoundData = nodeContent,
+                                    IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
+                                    QueryPosition = ++positionInList
+                                };
 
-                            returnNodesData.Add(newLine);
+                                returnNodesData.Add(newLine);
 
-                           
+
+                            }
+                            // turn off the spinner wait control showing that search action is completed
+                            this.SearchSpinnerOn = false;
+                            this.Source.AddRange(returnNodesData);
                         }
-                        // turn off the spinner wait control showing that search action is completed
-                        this.SearchSpinnerOn = false;
-                        this.Source.AddRange(returnNodesData);
                     },
                     this.synchronisationContext)
                 .ConfigureAwait(false);

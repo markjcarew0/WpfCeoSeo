@@ -1,31 +1,53 @@
-﻿using CeoSeoViewModels;
-using Serilog;
-using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MainWindow.cs" company="MarkJC">
+//   Author Mark Carew
+// </copyright>
+// <summary>
+// the main and only window in this small application
+// it is where the data from the google query is displayed
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace WpfCeoSeo
 {
+    using CeoSeoViewModels;
+    using DataTransferObjects;
+    using Serilog;
+    using System;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
+    using System.Windows.Input;
+    using System.Windows.Media;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// get the google data transient instance 
+        /// not really required to keep this as a private field.
+        /// It is a pass through parameter for the view model
+        /// </summary>
+        private IGoogleDataService googleDataService;
+
+        /// <summary>
+        /// logger is used for logging 
+        /// </summary>
         private ILogger logger;
 
         /// <summary>
         /// constructor
         /// </summary>
-        public MainWindow(ILogger _logger)
+        public MainWindow(ILogger _logger, IGoogleDataService _googleDataService)
         {
             this.logger = _logger;
+            this.googleDataService = _googleDataService;
 
             InitializeComponent();
 
-            this.DataContext = new MainWindowViewModel(_logger);
+            this.DataContext = new MainWindowViewModel(this.logger, this.googleDataService);
 
             logger.Write(Serilog.Events.LogEventLevel.Information, "Program started");
             logger.Information("Just testing");

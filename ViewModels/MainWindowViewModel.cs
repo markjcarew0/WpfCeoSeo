@@ -27,7 +27,12 @@ namespace CeoSeoViewModels
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
-        /// /
+        /// google data service to create instances of google data
+        /// </summary>
+        IGoogleDataService googleDataService;
+
+        /// <summary>
+        /// logger 
         /// </summary>
         private ILogger logger;
 
@@ -35,7 +40,7 @@ namespace CeoSeoViewModels
         /// the data that is shown in the UI
         /// filtered by
         /// </summary>
-        private List<GoogleSearchData> listData;
+        private List<IGoogleSearchData> listData;
 
         /// <summary>
         /// private backing field 
@@ -68,9 +73,10 @@ namespace CeoSeoViewModels
         /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
-        public MainWindowViewModel(ILogger _logger)
+        public MainWindowViewModel(ILogger _logger, IGoogleDataService _googleDataService)
         {
             logger = _logger;
+            googleDataService = _googleDataService;
 
             logger.Information("MainWindowViewModel open");
             this.SearchSpinnerOn = false;
@@ -97,8 +103,8 @@ namespace CeoSeoViewModels
                  .Subscribe(CreateFilteredListData);
 
             // clear all collections
-            this.SourceData = new List<GoogleSearchData>();
-            this.ListData = new List<GoogleSearchData>();
+            this.SourceData = new List<IGoogleSearchData>();
+            this.ListData = new List<IGoogleSearchData>();
             this.RankList = new List<int>();
 
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
@@ -110,7 +116,7 @@ namespace CeoSeoViewModels
         /// <summary>
         ///     Gets the RAW source that was returned from the google query
         /// </summary>
-        public List<GoogleSearchData> SourceData
+        public List<IGoogleSearchData> SourceData
         {
             get;
         }
@@ -119,7 +125,7 @@ namespace CeoSeoViewModels
         ///     Gets the listdata that is the filtered RAW source
         ///     that is displayed in the UI.
         /// </summary>
-        public List<GoogleSearchData> ListData
+        public List<IGoogleSearchData> ListData
         {
             get => listData;
             set
@@ -274,19 +280,17 @@ namespace CeoSeoViewModels
         /// <param name="x"></param>
         private void CreateSourceData(Task<HtmlNodeCollection> x)
         {
-            var returnNodesData = new List<GoogleSearchData>();
+            var returnNodesData = new List<IGoogleSearchData>();
 
             var positionInList = 0;
 
             foreach (HtmlNode oneNode in x.Result)
             {
                 var nodeContent = oneNode.InnerText;
-                var newLine = new GoogleSearchData
-                {
-                    FoundData = nodeContent,
-                    IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
-                    QueryPosition = ++positionInList
-                };
+                var newLine = GetGoogleDataInstance();
+                newLine.FoundData = nodeContent;
+                newLine.IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase);
+                newLine.QueryPosition = ++positionInList;
 
                 returnNodesData.Add(newLine);
             }
@@ -308,6 +312,12 @@ namespace CeoSeoViewModels
                     .Where(x => x.IsSmokeBall)
                     .Select(x => x.QueryPosition)
                     .ToList<int>();
+        } 
+
+        private IGoogleSearchData GetGoogleDataInstance()
+        {
+            var instance = googleDataService.GetGoogleSearchData();
+            return instance;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace WpfCeoSeo
     /// </summary>
     public partial class App : Application
     {
-        private IServiceProvider serviceProvider;
+        static IServiceProvider serviceProvider;
 
         public App()
         {
@@ -30,7 +30,7 @@ namespace WpfCeoSeo
         {
             services.AddSingleton<MainWindow>();
             services.AddSingleton(CreateLogger());
-            services.AddTransient<IGoogleSearchData, GoogleSearchData>();
+            services.AddTransient<IGoogleDataService>(provider => new GoogleDataService());
         }
 
 

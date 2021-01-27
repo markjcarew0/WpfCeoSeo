@@ -1,4 +1,13 @@
-﻿namespace CeoSeoViewModels
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ViewModelBase.cs" company="MarkJC">
+//   Author Mark Carew
+//   Date Sunday 24-01-2020
+// </copyright>
+// <summary>
+// Implimentation of IPropertyChanged for use as the base class for ViewModels
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+namespace CeoSeoViewModels
 {
     using System.ComponentModel;
 

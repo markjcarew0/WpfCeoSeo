@@ -1,9 +1,18 @@
-using CeoSeoDataAccess;
-using HtmlAgilityPack;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="UnitTestHtmlNodeCollection.cs" company="MarkJC">
+//   Author Mark Carew
+// </copyright>
+// <summary>
+//   Unit tests
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace UnitTests
 {
+    using CeoSeoDataAccess;
+    using HtmlAgilityPack;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class UnitTestHtmlNodeCollection
     {

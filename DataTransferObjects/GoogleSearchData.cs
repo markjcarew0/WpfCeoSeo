@@ -8,6 +8,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace DataTransferObjects
 {
+    /// <summary>
+    /// a data transfer object used to contain each line of 
+    /// the data returned from the google query
+    /// </summary>
     public class GoogleSearchData : IGoogleSearchData
     {
         private string foundData;

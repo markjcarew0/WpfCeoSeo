@@ -8,6 +8,7 @@
 //   CanExecute method is 'true'.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CeoSeoViewModels
 {
     using System;

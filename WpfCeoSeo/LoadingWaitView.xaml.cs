@@ -4,6 +4,7 @@
 // </copyright>
 // <summary>
 //   Interaction logic for LoadingWait.xaml
+//   runs a spinning circle of coloured dots to indicate processing activity
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

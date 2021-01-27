@@ -8,21 +8,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CeoSeoCommon;
-using DataTransferObjects;
-using HtmlAgilityPack;
-using ReactiveUI;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace CeoSeoViewModels
 {
+    using CeoSeoCommon;
+    using DataTransferObjects;
+    using HtmlAgilityPack;
+    using ReactiveUI;
+    using Serilog;
+    using Serilog.Events;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     //public class MainWindowViewModel : ReactiveObject, IDisposable
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {

@@ -192,6 +192,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding Path=ListData, UpdateSourceTrigger=PropertyChanged}"
                   CellStyle="{StaticResource PaddedDataGridCell}"
+                  Loaded="DataDatagrid_Loaded"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">
             <DataGrid.Resources>

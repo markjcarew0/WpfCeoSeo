@@ -3,11 +3,14 @@
 //   Author Mark Carew 
 // </copyright>
 // <summary>
-//   google data returned from query
+//   google data returned from query interface definition
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace DataTransferObjects
 {
+    /// <summary>
+    /// interface for implimentation by GoogleSearchData
+    /// </summary>
     public interface IGoogleSearchData
     {
         string FoundData { get; set; }

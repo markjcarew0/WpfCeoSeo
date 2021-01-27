@@ -8,10 +8,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using HtmlAgilityPack;
-
 namespace CeoSeoDataAccess
 {
+    using HtmlAgilityPack;
+
     /// <summary>
     /// seperate class and project for GoogleData
     /// </summary>
@@ -43,7 +43,8 @@ namespace CeoSeoDataAccess
         }
 
         /// <summary>
-        /// inform the user that the system returned no data 
+        /// inform the user that the system returned no data.
+        /// better to shomething rather that a blank line 
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>

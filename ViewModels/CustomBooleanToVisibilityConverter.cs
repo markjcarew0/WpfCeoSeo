@@ -19,7 +19,7 @@ namespace CeoSeoViewModels
     /// custom bool to visibility converter
     /// </summary>
     /// <remarks>
-    /// returns visibility depending a boolean binding
+    /// returns control visibility depending on a boolean property binding value
     /// </remarks>
     public sealed class CustomBooleanToVisibilityConverter : IValueConverter
     {

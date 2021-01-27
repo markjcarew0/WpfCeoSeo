@@ -10,16 +10,13 @@
 
 using CeoSeoCommon;
 using DataTransferObjects;
-using DynamicData;
-using DynamicData.Binding;
 using HtmlAgilityPack;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CeoSeoViewModels
@@ -28,15 +25,24 @@ namespace CeoSeoViewModels
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
+        /// if this was really a disposable class 
+        /// being instantiated and disposed 
+        /// </summary>
+        private readonly IDisposable cleanUp;
+
+        /// <summary>
+        /// the data that is shown in the UI
+        /// filtered by
+        /// </summary>
+        private List<GoogleSearchData> listData;
+
+        /// <summary>
         /// private backing field 
         /// for public Property QuerySearchString 
         /// </summary>
         private string querySearchString;
 
-        /// <summary>
-        ///     sync context tied to mainline
-        /// </summary>
-        private readonly TaskScheduler synchronisationContext;
+        private List<int> rankList;
 
         /// <summary>
         /// private backing field
@@ -49,13 +55,15 @@ namespace CeoSeoViewModels
         /// </summary>
         private bool smokeBallOnly;
 
-        private readonly IDisposable cleanUp;
+        /// <summary>
+        ///     syncro context
+        /// </summary>
+        private readonly TaskScheduler synchronisationContext;
 
         /// <summary>
-        /// the data that is shown in the UI
-        /// filtered by
+        /// incomplete implimentation 
         /// </summary>
-        private List<GoogleSearchData> listData;
+        private CancellationTokenSource cancelTokenSource;
 
         /// <summary>
         /// constructor for MainWindowViewModel
@@ -63,7 +71,7 @@ namespace CeoSeoViewModels
         public MainWindowViewModel()
         {
             this.SearchSpinnerOn = false;
-            this.SmokeBallOnly = true;
+            this.SmokeBallOnly = false;
 
             var scheduler = RxApp.MainThreadScheduler;
 
@@ -76,11 +84,12 @@ namespace CeoSeoViewModels
 
             this.WhenAnyValue(vm => vm.SmokeBallOnly)
                  .ObserveOn(scheduler)
-                 .Subscribe(FilterListData);
+                 .Subscribe(CreateFilteredListData);
 
             // clear all collections
             this.SourceData = new List<GoogleSearchData>();
             this.ListData = new List<GoogleSearchData>();
+            this.RankList = new List<int>();
 
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -89,70 +98,14 @@ namespace CeoSeoViewModels
             // cleanUp = new CompositeDisposable(disposableSource);
         }
 
-        /// <summary>
-        /// create the list of data that is to shown
-        /// which is data from SourceData property
-        /// filtered by 
-        /// </summary>
-        /// <param name="flterOrNotFilter"></param>
-        private void FilterListData(bool flterOrNotFilter)
-        {
-            this.ListData =
-                    this.SourceData
-                    .Where(x => x.IsSmokeBall == flterOrNotFilter)
-                    .ToList();
-        }
-
-        private void GetQueryResultData(string query)
-        {
-            // turn on the spinner wait control showing that earch action is being executed
-            this.SearchSpinnerOn = true;
-
-            // run the search in a task so that we can set the ui 
-            Task.Run(
-                    () =>
-                    {
-                        return GoogleDataBroker.GetSearchResponse(query);
-                    })
-                .ContinueWith(
-                    x =>
-                    {
-                        this.SourceData.Clear();
-                        var returnNodesData = new List<GoogleSearchData>();
-                        var positionInList = 0;
-
-
-                        if (x.Result != null)
-                        {
-                            foreach (HtmlNode oneNode in x.Result)
-                            {
-                                var nodeContent = oneNode.InnerText;
-                                var newLine = new GoogleSearchData
-                                {
-                                    FoundData = nodeContent,
-                                    IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
-                                    QueryPosition = ++positionInList
-                                };
-
-                                returnNodesData.Add(newLine);
-
-
-                            }
-                            // turn off the spinner wait control showing that search action is completed
-                            this.SearchSpinnerOn = false;
-                            this.SourceData.AddRange(returnNodesData);
-
-                            FilterListData(this.SmokeBallOnly);
-                        }
-                    },
-                    this.synchronisationContext)
-                .ConfigureAwait(false);
-        }
 
         /// <summary>
         ///     Gets the source.
         /// </summary>
-        public List<GoogleSearchData> SourceData { get; }
+        public List<GoogleSearchData> SourceData
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets the source.
@@ -217,9 +170,127 @@ namespace CeoSeoViewModels
             }
         }
 
+        /// <summary>
+        /// a list showing the rank positions in seo order that the
+        /// query returnde results that contained SmokeBall
+        /// </summary>
+        public List<int> RankList
+        {
+            get => rankList;
+            set
+            {
+                rankList = value;
+                this.OnPropertyChanged(nameof(this.RankList));
+            }
+        }
+
+        /// <summary>
+        /// minimum implementation of IDisposable
+        /// </summary>
         public void Dispose()
         {
             cleanUp.Dispose();
+        }
+
+        /// <summary>
+        /// create the list of data that is to shown
+        /// which is data from SourceData property
+        /// filtered by 
+        /// </summary>
+        /// <param name="flterOrNotFilter"></param>
+        private void CreateFilteredListData(bool flterOrNotFilter)
+        {
+            if (flterOrNotFilter)
+            {
+                this.ListData =
+                        this.SourceData
+                        .Where(x => x.IsSmokeBall == flterOrNotFilter)
+                        .ToList();
+            }
+            else
+            {
+                this.ListData =
+                       this.SourceData
+                       .ToList();
+            }
+        }
+
+        /// <summary>
+        ///  get the raw data from the google query
+        /// </summary>
+        /// <param name="query"></param>
+        private void GetQueryResultData(string query)
+        {
+            this.CancelCreateProcess();
+
+            // turn on the spinner wait control showing that earch action is being executed
+            this.SearchSpinnerOn = true;
+
+            // run the search in a task so that we can set the ui 
+            var CancelTask = Task.Run(
+                    () =>
+                    {
+                        return GoogleDataBroker.GetSearchResponse(query);
+                    })
+                .ContinueWith(
+                    x =>
+                    {
+                        if (x.Result != null)
+                        {
+                            this.SourceData.Clear();
+
+                            CreateSourceData(x);
+
+                            CreateFilteredListData(this.SmokeBallOnly);
+
+                            this.SearchSpinnerOn = false;
+                        }
+                    },
+                    this.synchronisationContext)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// create the source data from the google query returned results
+        /// </summary>
+        /// <param name="x"></param>
+        private void CreateSourceData(Task<HtmlNodeCollection> x)
+        {
+            var returnNodesData = new List<GoogleSearchData>();
+
+            var positionInList = 0;
+
+            foreach (HtmlNode oneNode in x.Result)
+            {
+                var nodeContent = oneNode.InnerText;
+                var newLine = new GoogleSearchData
+                {
+                    FoundData = nodeContent,
+                    IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase),
+                    QueryPosition = ++positionInList
+                };
+
+                returnNodesData.Add(newLine);
+            }
+            // turn off the spinner wait control showing that search action is completed
+            this.SourceData.AddRange(returnNodesData);
+
+            // build up the rank list for smokeball appearances
+            MakeRankList();
+
+        }
+
+        /// <summary>
+        ///  build up the rank list for smokeball appearances
+        /// </summary>
+        private void MakeRankList()
+        {
+            this.RankList.Clear();
+            this.RankList =
+                this.SourceData
+                    .Where(x => x.IsSmokeBall)
+                    .Select(x => x.QueryPosition)
+                    .ToList<int>();
         }
     }
 }

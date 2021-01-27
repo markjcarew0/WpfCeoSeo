@@ -2,6 +2,7 @@
 using DataTransferObjects;
 using HtmlAgilityPack;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace CeoSeoCommon
 {

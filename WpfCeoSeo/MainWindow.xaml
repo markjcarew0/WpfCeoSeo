@@ -10,6 +10,7 @@
         FontSize="16"
         Title="Ceo Seo Google Hits"
         WindowStartupLocation="CenterScreen"
+        x:Name="MainWindowWindow"
         Height="800"
         Width="1200">
     <Window.DataContext>
@@ -132,6 +133,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -141,6 +143,8 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
+        
+        <!--row 00 -->
         <TextBlock Text="Google Search string  -:"
                    Grid.Row="00"
                    Grid.Column="00"
@@ -151,30 +155,68 @@
                  VerticalContentAlignment="Center"
                  Margin="10" />
         <CheckBox IsChecked="{Binding Path=SmokeBallOnly, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Row="00"
-                 Grid.Column="02"
-                 VerticalContentAlignment="Center"
-                 Content="Smokeball only"
-                 Margin="10" />
+                  Grid.Row="00"
+                  Grid.Column="02"
+                  VerticalContentAlignment="Center"
+                  Content="Smokeball only"
+                  Margin="10" />
+
+        <!--row 01 -->
+        <Border Grid.Row="01"
+                Grid.Column="00"
+                Grid.ColumnSpan="03"
+                BorderThickness="1"
+                BorderBrush="PaleGreen">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                <TextBlock Text="SEO Rankings "
+                           Margin="10,0" />
+                <ListView  HorizontalContentAlignment="Stretch"
+                           ItemsSource="{Binding Path=RankList, UpdateSourceTrigger=PropertyChanged}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ListViewItem>
+                                <TextBlock Text="{Binding Path=.}"
+                                           Margin="10,0" />
+                            </ListViewItem>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </Border>
+        <!--row 02 -->
         <DataGrid x:Name="DataDatagrid"
-                  Grid.Row="01"
+                  Grid.Row="02"
                   Grid.ColumnSpan="03"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding Path=ListData, UpdateSourceTrigger=PropertyChanged}"
                   CellStyle="{StaticResource PaddedDataGridCell}"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="LightBlue" />
+            </DataGrid.Resources>
             <DataGrid.RowStyle>
-            <Style TargetType="{x:Type DataGridRow}">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Path=IsSmokeBall}"
-                                 Value="True">
-                        <Setter Property="Background"
-                                Value="HotPink" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-                </DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsSmokeBall}"
+                                           Value="True" />
+                                <Condition Binding="{Binding Path=DataContext.SmokeBallOnly, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
+                                           Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Background"
+                                    Value="PaleGreen" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="45"
                                         Header="Rank">
@@ -208,19 +250,22 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button Grid.Row="02"
-                Click="Button_Click"
+        <!--row 03 -->
+        <Button Grid.Row="03"
+                Click="ShutDownButtonClick"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Grid.ColumnSpan="03"
                 Margin="0,0,0,12">
-            <TextBox Text="Press Me"
+            <TextBox Text="Exit Application"
                      Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
                      BorderThickness="0" />
         </Button>
+        
+        <!--rows all -->
         <Viewbox Height="50"
                  Grid.Row="00"
-                 Grid.RowSpan="03"
+                 Grid.RowSpan="04"
                  Grid.ColumnSpan="03">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
         </Viewbox>

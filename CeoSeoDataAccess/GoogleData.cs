@@ -1,13 +1,24 @@
-﻿using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Threading;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="GoogleData.cs" company="MarkJC">
+//   Author Mark Carew
+//   Date Sunday 24-01-2020
+// </copyright>
+// <summary>
+// the static class that reads data from google via HtmlAgilityPack 
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+using HtmlAgilityPack;
 
 namespace CeoSeoDataAccess
 {
+    /// <summary>
+    /// seperate class and project for GoogleData
+    /// </summary>
     public static class GoogleData
     {
         /// <summary>
-        /// run the google query against the query string passed to it
+        /// run the google query using the query string passed to it
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>

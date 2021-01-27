@@ -4,7 +4,7 @@
 //   Date Sunday 24-01-2020
 // </copyright>
 // <summary>
-// View Model for the Ceo Seo UI 
+// View Model for the Ceo Seo UI MainWindow.xaml
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,8 @@ using CeoSeoCommon;
 using DataTransferObjects;
 using HtmlAgilityPack;
 using ReactiveUI;
+using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +27,9 @@ namespace CeoSeoViewModels
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
-        /// if this was really a disposable class 
-        /// being instantiated and disposed 
+        /// /
         /// </summary>
-        private readonly IDisposable cleanUp;
+        private ILogger logger;
 
         /// <summary>
         /// the data that is shown in the UI
@@ -42,6 +43,10 @@ namespace CeoSeoViewModels
         /// </summary>
         private string querySearchString;
 
+        /// <summary>
+        /// private backing field 
+        /// for public Property RankList 
+        /// </summary>
         private List<int> rankList;
 
         /// <summary>
@@ -51,7 +56,7 @@ namespace CeoSeoViewModels
         private bool searchSpinnerOn;
 
         /// <summary>
-        /// show only data that contains smokeball
+        /// show only data that contains the string smokeball
         /// </summary>
         private bool smokeBallOnly;
 
@@ -61,27 +66,32 @@ namespace CeoSeoViewModels
         private readonly TaskScheduler synchronisationContext;
 
         /// <summary>
-        /// incomplete implimentation 
-        /// </summary>
-        private CancellationTokenSource cancelTokenSource;
-
-        /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
-        public MainWindowViewModel()
+        public MainWindowViewModel(ILogger _logger)
         {
+            logger = _logger;
+
+            logger.Information("MainWindowViewModel open");
             this.SearchSpinnerOn = false;
             this.SmokeBallOnly = false;
 
             var scheduler = RxApp.MainThreadScheduler;
 
-            // build original data set
+            // subscribe to 
+            // building original data set
+            // when the query string is changed after
+            // waiting 350 milliseconds for the user to stop typing
             this.WhenAnyValue(vm => vm.QuerySearchString)
             .Where(x => x != null)
             .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
             .ObserveOn(scheduler)
             .Subscribe(this.GetQueryResultData);
 
+            // subscribe to 
+            // creating the data that is bound to the ui view
+            // when the user changes the value vound to the check box
+            // refresh the data that is in the datagrid accordingly
             this.WhenAnyValue(vm => vm.SmokeBallOnly)
                  .ObserveOn(scheduler)
                  .Subscribe(CreateFilteredListData);
@@ -93,14 +103,12 @@ namespace CeoSeoViewModels
 
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
+            // initialise the query string to the requirement to search for "conveyancing software"
             this.QuerySearchString = "conveyancing software";
-
-            // cleanUp = new CompositeDisposable(disposableSource);
         }
 
-
         /// <summary>
-        ///     Gets the source.
+        ///     Gets the RAW source that was returned from the google query
         /// </summary>
         public List<GoogleSearchData> SourceData
         {
@@ -108,7 +116,8 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
-        ///     Gets the source.
+        ///     Gets the listdata that is the filtered RAW source
+        ///     that is displayed in the UI.
         /// </summary>
         public List<GoogleSearchData> ListData
         {
@@ -141,6 +150,7 @@ namespace CeoSeoViewModels
         /// property that toggles on and off the visibility of 
         /// the spinner control 
         /// that indicates that processing activity is going on
+        /// in retrieving data from google 
         /// </summary>
         public bool SearchSpinnerOn
         {
@@ -157,7 +167,7 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
-        /// filter to show only smoke ball data
+        /// filter to show only smokeball data
         /// </summary>
         public bool SmokeBallOnly
         {
@@ -172,7 +182,7 @@ namespace CeoSeoViewModels
 
         /// <summary>
         /// a list showing the rank positions in seo order that the
-        /// query returnde results that contained SmokeBall
+        /// query returned data results that containing the string smokeball
         /// </summary>
         public List<int> RankList
         {
@@ -189,19 +199,21 @@ namespace CeoSeoViewModels
         /// </summary>
         public void Dispose()
         {
-            cleanUp.Dispose();
+            // cleanUp.Dispose();
         }
 
         /// <summary>
-        /// create the list of data that is to shown
+        /// create the data list to show
         /// which is data from SourceData property
-        /// filtered by 
+        /// filtered or not as required
         /// </summary>
         /// <param name="flterOrNotFilter"></param>
         private void CreateFilteredListData(bool flterOrNotFilter)
         {
             if (flterOrNotFilter)
             {
+                // only filter when required
+                // showing smokeball data only
                 this.ListData =
                         this.SourceData
                         .Where(x => x.IsSmokeBall == flterOrNotFilter)
@@ -209,6 +221,7 @@ namespace CeoSeoViewModels
             }
             else
             {
+                // show all data unfiltered
                 this.ListData =
                        this.SourceData
                        .ToList();
@@ -221,33 +234,38 @@ namespace CeoSeoViewModels
         /// <param name="query"></param>
         private void GetQueryResultData(string query)
         {
-            this.CancelCreateProcess();
-
             // turn on the spinner wait control showing that earch action is being executed
             this.SearchSpinnerOn = true;
 
-            // run the search in a task so that we can set the ui 
-            var CancelTask = Task.Run(
-                    () =>
-                    {
-                        return GoogleDataBroker.GetSearchResponse(query);
-                    })
-                .ContinueWith(
-                    x =>
-                    {
-                        if (x.Result != null)
+            try
+            {
+                // run the search in a task so that we can set the ui 
+                var CancelTask = Task.Run(
+                        () =>
                         {
-                            this.SourceData.Clear();
+                            return GeneralDataBroker.GetSearchResponse(query);
+                        })
+                    .ContinueWith(
+                        x =>
+                        {
+                            if (x.Result != null)
+                            {
+                                this.SourceData.Clear();
 
-                            CreateSourceData(x);
+                                CreateSourceData(x);
 
-                            CreateFilteredListData(this.SmokeBallOnly);
+                                CreateFilteredListData(this.SmokeBallOnly);
 
-                            this.SearchSpinnerOn = false;
-                        }
-                    },
-                    this.synchronisationContext)
-                .ConfigureAwait(false);
+                                this.SearchSpinnerOn = false;
+                            }
+                        },
+                        this.synchronisationContext)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.Write(LogEventLevel.Error, ex, "Reading google data");
+            }
         }
 
         /// <summary>
@@ -277,7 +295,6 @@ namespace CeoSeoViewModels
 
             // build up the rank list for smokeball appearances
             MakeRankList();
-
         }
 
         /// <summary>

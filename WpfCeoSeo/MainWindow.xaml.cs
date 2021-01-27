@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CeoSeoViewModels;
+using Serilog;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -12,12 +14,21 @@ namespace WpfCeoSeo
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ILogger logger;
+
         /// <summary>
         /// constructor
         /// </summary>
-        public MainWindow()
+        public MainWindow(ILogger _logger)
         {
+            this.logger = _logger;
+
             InitializeComponent();
+
+            this.DataContext = new MainWindowViewModel(_logger);
+
+            logger.Write(Serilog.Events.LogEventLevel.Information, "Program started");
+            logger.Information("Just testing");
         }
 
         /// <summary>

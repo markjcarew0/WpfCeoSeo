@@ -8,7 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace DataTransferObjects
 {
-    public class GoogleSearchData
+    public class GoogleSearchData : IGoogleSearchData
     {
         private string foundData;
 

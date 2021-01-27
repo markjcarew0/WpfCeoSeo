@@ -13,9 +13,6 @@
         x:Name="MainWindowWindow"
         Height="800"
         Width="1200">
-    <Window.DataContext>
-        <ceoseoviewmodels1:MainWindowViewModel />
-    </Window.DataContext>
     <Window.Resources>
         <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
                                                               DefaultHideMethod="Hidden" />

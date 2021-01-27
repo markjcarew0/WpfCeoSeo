@@ -4,6 +4,8 @@
 // </copyright>
 // <summary>
 //   Defines the CustomBooleanToVisibilityConverter type.
+//   a converter for turning boolean values into xaml visibilty values
+//   used in XAML bindings with converter = {StaticResource ......
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

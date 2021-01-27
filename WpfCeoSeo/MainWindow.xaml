@@ -18,10 +18,6 @@
     <Window.Resources>
         <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
                                                               DefaultHideMethod="Hidden" />
-        <!--<CollectionViewSource x:Key="queryData"
-                              Source="{Binding Source}"
-                              Filter="CollectionViewSource_Filter">-->
-        <!--</CollectionViewSource>-->
         <!-- Datagrid styles -->
         <Style x:Key="PaddedDataGridCell"
                TargetType="{x:Type DataGridCell}">
@@ -158,13 +154,13 @@
                  Grid.Row="00"
                  Grid.Column="02"
                  VerticalContentAlignment="Center"
+                 Content="Smokeball only"
                  Margin="10" />
-
         <DataGrid x:Name="DataDatagrid"
                   Grid.Row="01"
                   Grid.ColumnSpan="03"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  ItemsSource="{Binding Path=Source, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Path=ListData, UpdateSourceTrigger=PropertyChanged}"
                   CellStyle="{StaticResource PaddedDataGridCell}"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">

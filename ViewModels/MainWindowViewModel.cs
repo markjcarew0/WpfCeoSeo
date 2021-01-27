@@ -17,12 +17,15 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace CeoSeoViewModels
 {
-    public class MainWindowViewModel : ReactiveObject
+    //public class MainWindowViewModel : ReactiveObject, IDisposable
+    public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
         /// private backing field 
@@ -41,7 +44,18 @@ namespace CeoSeoViewModels
         /// </summary>
         private bool searchSpinnerOn;
 
+        /// <summary>
+        /// show only data that contains smokeball
+        /// </summary>
         private bool smokeBallOnly;
+
+        private readonly IDisposable cleanUp;
+
+        /// <summary>
+        /// the data that is shown in the UI
+        /// filtered by
+        /// </summary>
+        private List<GoogleSearchData> listData;
 
         /// <summary>
         /// constructor for MainWindowViewModel
@@ -53,33 +67,40 @@ namespace CeoSeoViewModels
 
             var scheduler = RxApp.MainThreadScheduler;
 
+            // build original data set
             this.WhenAnyValue(vm => vm.QuerySearchString)
             .Where(x => x != null)
             .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
             .ObserveOn(scheduler)
             .Subscribe(this.GetQueryResultData);
 
-            var observableFilter =
-                this.WhenAnyValue(vm => vm.SmokeBallOnly)
+            this.WhenAnyValue(vm => vm.SmokeBallOnly)
                  .ObserveOn(scheduler)
-                 .Select(MakeFilter);
+                 .Subscribe(FilterListData);
 
-            this.Source = new ObservableCollectionExtended<GoogleSearchData>();
-
-            this.Source.ToObservableChangeSet()
-                .Filter(observableFilter)
-                .ObserveOn(scheduler)
-                .Bind(out this.details)
-                .Subscribe();
+            // clear all collections
+            this.SourceData = new List<GoogleSearchData>();
+            this.ListData = new List<GoogleSearchData>();
 
             this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
             this.QuerySearchString = "conveyancing software";
+
+            // cleanUp = new CompositeDisposable(disposableSource);
         }
 
-        private Func<GoogleSearchData, bool> MakeFilter(bool arg)
+        /// <summary>
+        /// create the list of data that is to shown
+        /// which is data from SourceData property
+        /// filtered by 
+        /// </summary>
+        /// <param name="flterOrNotFilter"></param>
+        private void FilterListData(bool flterOrNotFilter)
         {
-            return vm => vm.IsSmokeBall == arg;
+            this.ListData =
+                    this.SourceData
+                    .Where(x => x.IsSmokeBall == flterOrNotFilter)
+                    .ToList();
         }
 
         private void GetQueryResultData(string query)
@@ -96,7 +117,7 @@ namespace CeoSeoViewModels
                 .ContinueWith(
                     x =>
                     {
-                        this.Source.Clear();
+                        this.SourceData.Clear();
                         var returnNodesData = new List<GoogleSearchData>();
                         var positionInList = 0;
 
@@ -119,7 +140,9 @@ namespace CeoSeoViewModels
                             }
                             // turn off the spinner wait control showing that search action is completed
                             this.SearchSpinnerOn = false;
-                            this.Source.AddRange(returnNodesData);
+                            this.SourceData.AddRange(returnNodesData);
+
+                            FilterListData(this.SmokeBallOnly);
                         }
                     },
                     this.synchronisationContext)
@@ -129,7 +152,20 @@ namespace CeoSeoViewModels
         /// <summary>
         ///     Gets the source.
         /// </summary>
-        public ObservableCollectionExtended<GoogleSearchData> Source { get; }
+        public List<GoogleSearchData> SourceData { get; }
+
+        /// <summary>
+        ///     Gets the source.
+        /// </summary>
+        public List<GoogleSearchData> ListData
+        {
+            get => listData;
+            set
+            {
+                listData = value;
+                this.OnPropertyChanged(nameof(this.ListData));
+            }
+        }
 
         /// <summary>
         /// contains the query string UI entered for the google search 
@@ -143,7 +179,8 @@ namespace CeoSeoViewModels
 
             set
             {
-                this.RaiseAndSetIfChanged(ref this.querySearchString, value);
+                this.querySearchString = value;
+                this.OnPropertyChanged(nameof(this.QuerySearchString));
             }
         }
 
@@ -161,42 +198,28 @@ namespace CeoSeoViewModels
 
             set
             {
-                this.RaiseAndSetIfChanged(ref this.searchSpinnerOn, value);
+                this.searchSpinnerOn = value;
+                this.OnPropertyChanged(nameof(this.SearchSpinnerOn));
             }
         }
 
-        private List<GoogleSearchData> googleReturnedData;
-
-        public List<GoogleSearchData> GoogleReturnedData
-        {
-            get { return googleReturnedData; }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.googleReturnedData, value);
-            }
-        }
-
-        /// <summary>
-        ///     The details.
-        /// </summary>
-        private ReadOnlyObservableCollection<GoogleSearchData> details;
-
-        /// <summary>
-        ///     Gets or sets the details.
-        /// </summary>
-        public ReadOnlyObservableCollection<GoogleSearchData> Details
-        {
-            get => this.details;
-
-            set => this.RaiseAndSetIfChanged(ref this.details, value);
-        }
         /// <summary>
         /// filter to show only smoke ball data
         /// </summary>
         public bool SmokeBallOnly
         {
             get => smokeBallOnly;
-            set => this.RaiseAndSetIfChanged(ref this.smokeBallOnly, value);
+
+            set
+            {
+                this.smokeBallOnly = value;
+                this.OnPropertyChanged(nameof(this.SmokeBallOnly));
+            }
+        }
+
+        public void Dispose()
+        {
+            cleanUp.Dispose();
         }
     }
 }

@@ -42,15 +42,22 @@ namespace WpfCeoSeo
         /// </summary>
         public MainWindow(ILogger _logger, IGoogleDataService _googleDataService)
         {
-            this.logger = _logger;
-            this.googleDataService = _googleDataService;
+            try
+            {
+                this.logger = _logger;
+                this.googleDataService = _googleDataService;
 
-            InitializeComponent();
+                InitializeComponent();
 
-            this.DataContext = new MainWindowViewModel(this.logger, this.googleDataService);
+                this.DataContext = new MainWindowViewModel(this.logger, this.googleDataService);
 
-            logger.Write(Serilog.Events.LogEventLevel.Information, "Program started");
-            logger.Information("Just testing");
+                logger.Write(Serilog.Events.LogEventLevel.Information, "Program started");
+                logger.Information("Just testing");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Application crashed on startup");
+            }
         }
 
         /// <summary>

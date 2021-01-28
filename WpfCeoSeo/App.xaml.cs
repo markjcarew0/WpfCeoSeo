@@ -9,6 +9,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+
 namespace WpfCeoSeo
 {
     using Microsoft.Extensions.DependencyInjection;

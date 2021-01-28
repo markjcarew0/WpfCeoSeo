@@ -55,7 +55,7 @@ Unfortunately its size is 163 Meg and a note of caution is that you should not s
 the trim option as a publish parameter as it is still experimental and creates a much
  smaller .exe file 
 that does not execute successfully. 
-Zipping ths resulting single .exe file reduces its size to 66 Meg.  
+Zipping ths resulting single .exe file reduces its size to 66 Meg.    
 
 ###### Source control   
 The program solution and project files and all other artifacts are stored in a GitHub repository.  

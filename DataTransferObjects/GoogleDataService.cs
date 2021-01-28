@@ -6,6 +6,8 @@
 //   google data returned from query
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+
 namespace DataTransferObjects
 {
     public class GoogleDataService : IGoogleDataService

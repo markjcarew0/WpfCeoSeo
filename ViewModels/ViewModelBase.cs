@@ -7,6 +7,8 @@
 // Implimentation of IPropertyChanged for use as the base class for ViewModels
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+
 namespace CeoSeoViewModels
 {
     using System.ComponentModel;

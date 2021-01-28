@@ -6,6 +6,8 @@
 //   google data returned from query
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+
 namespace DataTransferObjects
 {
     /// <summary>

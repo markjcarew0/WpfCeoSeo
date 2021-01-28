@@ -4,6 +4,5 @@
              DispatcherUnhandledException="AppDispatcherUnhandledException"
              Startup="OnStartup">
     <Application.Resources>
-         
     </Application.Resources>
 </Application>

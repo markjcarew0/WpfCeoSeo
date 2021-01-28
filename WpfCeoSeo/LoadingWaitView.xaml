@@ -5,7 +5,7 @@
              Height="103"
              Width="102">
     <UserControl.Resources>
-        <SolidColorBrush Color="HotPink"
+        <SolidColorBrush Color="Green"
                          x:Key="CirclesColor" />
     </UserControl.Resources>
 

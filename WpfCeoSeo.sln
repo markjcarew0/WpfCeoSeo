@@ -13,7 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CeoSeoCommon", "WpfCommon\C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfCeoSeo", "WpfCeoSeo\WpfCeoSeo.csproj", "{28BF2805-84E1-4383-BA6B-FC82418CB7E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{E2A85DB3-32F6-4276-9F89-FEC398871DA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{E2A85DB3-32F6-4276-9F89-FEC398871DA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging", "Messaging\Messaging.csproj", "{E913DF58-0698-4AEB-8276-D611EC387B0D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{137A9E3A-85D7-49DE-919A-6BC8B3497DB4}"
+	ProjectSection(SolutionItems) = preProject
+		ProgramCapture.PNG = ProgramCapture.PNG
+		ReadMe.md = ReadMe.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -253,6 +261,42 @@ Global
 		{E2A85DB3-32F6-4276-9F89-FEC398871DA8}.UAT|x64.Build.0 = Debug|Any CPU
 		{E2A85DB3-32F6-4276-9F89-FEC398871DA8}.UAT|x86.ActiveCfg = Debug|Any CPU
 		{E2A85DB3-32F6-4276-9F89-FEC398871DA8}.UAT|x86.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|x64.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Debug|x86.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|Any CPU.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|Any CPU.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|x64.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|x64.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|x86.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Integration|x86.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|Any CPU.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|Any CPU.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|x64.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|x64.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|x86.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction_withUpdateService|x86.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|Any CPU.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|Any CPU.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|x64.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|x64.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|x86.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.PreProduction|x86.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|x64.ActiveCfg = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|x64.Build.0 = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|x86.ActiveCfg = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.Release|x86.Build.0 = Release|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|Any CPU.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|Any CPU.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|x64.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|x64.Build.0 = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|x86.ActiveCfg = Debug|Any CPU
+		{E913DF58-0698-4AEB-8276-D611EC387B0D}.UAT|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,8 +30,6 @@ namespace WpfCeoSeo
         /// </param>
         public static void SetFocusToDataGrid(DataGrid grid)
         {
-            // TODO: this does not work 
-            // TODO: needs resolution
             if (grid.Items.Count > 0)
             {
                 // If nothing is selected, then select the first prescriber

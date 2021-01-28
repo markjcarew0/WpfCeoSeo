@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataTransferObjects\DataTransferObjects.csproj" />
+    <ProjectReference Include="..\Messaging\Messaging.csproj" />
     <ProjectReference Include="..\WpfCommon\CeoSeoCommon.csproj" />
   </ItemGroup>
 

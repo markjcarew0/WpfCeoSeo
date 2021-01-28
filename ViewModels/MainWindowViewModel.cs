@@ -13,6 +13,7 @@ namespace CeoSeoViewModels
     using CeoSeoCommon;
     using DataTransferObjects;
     using HtmlAgilityPack;
+    using Messaging;
     using ReactiveUI;
     using Serilog;
     using Serilog.Events;
@@ -262,6 +263,8 @@ namespace CeoSeoViewModels
                                 CreateFilteredListData(this.SmokeBallOnly);
 
                                 this.SearchSpinnerOn = false;
+
+                                Messenger.SendMessageSingleton("SetFocus", "RefreshDataDatagrid", "MainWindow");
                             }
                         },
                         this.synchronisationContext)

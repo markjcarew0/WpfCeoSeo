@@ -192,7 +192,6 @@
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding Path=ListData, UpdateSourceTrigger=PropertyChanged}"
                   CellStyle="{StaticResource PaddedDataGridCell}"
-                  Loaded="DataDatagrid_Loaded"
                   Style="{StaticResource StandardDataGrid}"
                   ColumnWidth="Auto">
             <DataGrid.Resources>
@@ -216,8 +215,13 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Width="45"
-                                        Header="Rank">
+                <DataGridTemplateColumn Width="50">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="SE" />
+                            <TextBlock Text="Rank" />
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=QueryPosition}"
@@ -225,8 +229,10 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="*"
-                                        Header="Data">
+                <DataGridTemplateColumn Width="*">
+                    <DataGridTemplateColumn.Header>
+                            <TextBlock Text="Data" TextAlignment="Center" HorizontalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=FoundData}"
@@ -236,8 +242,13 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="45"
-                                        Header="Dispensed">
+                <DataGridTemplateColumn Width="60">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="Smoke" />
+                            <TextBlock Text="Ball ?" />
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=IsSmokeBall}"
@@ -261,7 +272,7 @@
         </Button>
         
         <!--rows all -->
-        <Viewbox Height="50"
+        <Viewbox Height="150"
                  Grid.Row="00"
                  Grid.RowSpan="04"
                  Grid.ColumnSpan="03">

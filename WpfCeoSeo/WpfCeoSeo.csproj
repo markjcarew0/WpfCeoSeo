@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataTransferObjects\DataTransferObjects.csproj" />
+    <ProjectReference Include="..\Messaging\Messaging.csproj" />
     <ProjectReference Include="..\ViewModels\CeoSeoViewModels.csproj" />
   </ItemGroup>
 

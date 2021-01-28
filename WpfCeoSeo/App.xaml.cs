@@ -16,12 +16,15 @@ namespace WpfCeoSeo
     using Serilog;
     using System.Windows;
     using DataTransferObjects;
+    using System.Windows.Threading;
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
         static IServiceProvider serviceProvider;
+        ILogger localLogger;
 
         public App()
         {
@@ -40,7 +43,8 @@ namespace WpfCeoSeo
             services.AddSingleton<MainWindow>();
 
             // allows the creation of a logger for the application by Dependency Inversion
-            services.AddSingleton(CreateLogger());
+            localLogger = CreateLogger();
+            services.AddSingleton(localLogger);
 
             // allows the creation of instances of the only Data Transfer Object used by the application by Dependency Inversion
             services.AddTransient<IGoogleDataService>(provider => new GoogleDataService());
@@ -73,5 +77,28 @@ namespace WpfCeoSeo
 
             return logger;
         }
+
+        /// <summary>
+        ///     The app dispatcher unhandled exception.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            // Process unhandled exception
+            // Prevent default unhandled exception processing
+            if (this.MainWindow != null)
+            {
+                MessageBox.Show(this.MainWindow, e.Exception.StackTrace, "Dispatcher Exception");
+            }
+
+            localLogger.Error(e.Exception, "DispatcherUnhandledException");
+            e.Handled = true;
+        }
+
     }
- }
+}

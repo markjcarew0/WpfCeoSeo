@@ -238,7 +238,7 @@
                             <TextBlock Text="{Binding Path=FoundData}"
                                        TextTrimming="CharacterEllipsis"
                                        Padding="2"
-                                       TextAlignment="Center" />
+                                       TextAlignment="Left" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

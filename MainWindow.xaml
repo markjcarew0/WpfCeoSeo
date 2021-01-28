@@ -1,0 +1,283 @@
+﻿<Window x:Class="WpfCeoSeo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpfceoseo="clr-namespace:WpfCeoSeo"
+        xmlns:ceoseoviewmodels1="clr-namespace:CeoSeoViewModels;assembly=CeoSeoViewModels"
+        Background="AliceBlue"
+        mc:Ignorable="d"
+        FontSize="16"
+        Title="Ceo Seo Google Hits"
+        WindowStartupLocation="CenterScreen"
+        x:Name="MainWindowWindow"
+        Height="800"
+        Width="1200">
+    
+    <Window.Resources>
+        <ceoseoviewmodels1:CustomBooleanToVisibilityConverter x:Key="BoolToHiddenVis"
+                                                              DefaultHideMethod="Hidden" />
+        <!-- Datagrid styles -->
+        <Style x:Key="PaddedDataGridCell"
+               TargetType="{x:Type DataGridCell}">
+            <Setter Property="Padding"
+                    Value="5 3" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Border  Padding="{TemplateBinding Padding}"
+                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                 Background="{TemplateBinding Background}"
+                                 SnapsToDevicePixels="True">
+                            <Border VerticalAlignment="Center">
+                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}" />
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}"
+                                   Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}, Path=IsKeyboardFocusWithin}"
+                                   Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        <Setter Property="Foreground"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StandardDataGrid"
+               TargetType="{x:Type DataGrid}">
+            <Setter Property="AutoGenerateColumns"
+                    Value="False" />
+            <Setter Property="HeadersVisibility"
+                    Value="Column" />
+            <Setter Property="CanUserAddRows"
+                    Value=" False" />
+            <Setter Property="CanUserDeleteRows"
+                    Value=" False" />
+            <Setter Property="IsReadOnly"
+                    Value=" True" />
+            <Setter Property="GridLinesVisibility"
+                    Value=" None" />
+            <Setter Property="AlternatingRowBackground"
+                    Value="PaleGoldenrod" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="SelectionUnit"
+                    Value="FullRow" />
+            <Setter Property="IsSynchronizedWithCurrentItem"
+                    Value="True" />
+            <Setter Property="EnableRowVirtualization"
+                    Value="True" />
+            <Setter Property="CanUserReorderColumns"
+                    Value="False" />
+            <Setter Property="CanUserResizeColumns"
+                    Value="False" />
+            <Setter Property="SelectionMode"
+                    Value="Single" />
+        </Style>
+        <!-- other sytles -->
+        <Style TargetType="Button">
+            <Style.Setters>
+                <Setter Property="Opacity"
+                        Value=".65" />
+                <Setter Property="Padding"
+                        Value="7" />
+                <Setter Property="Background"
+                        Value="LightCyan" />
+            </Style.Setters>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius"
+                            Value="5" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style TargetType="TextBox">
+            <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius"
+                            Value="5" />
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <!--row 00 -->
+        <TextBlock Text="Google Search string  -:"
+                   Grid.Row="00"
+                   Grid.Column="00"
+                   Margin="10" />
+        <TextBox Text="{Binding Path=QuerySearchString, UpdateSourceTrigger=PropertyChanged}"
+                 Grid.Row="00"
+                 Grid.Column="01"
+                 VerticalContentAlignment="Center"
+                 Margin="10" />
+        <CheckBox IsChecked="{Binding Path=SmokeBallOnly, UpdateSourceTrigger=PropertyChanged}"
+                  Grid.Row="00"
+                  Grid.Column="02"
+                  VerticalContentAlignment="Center"
+                  Content="Smokeball only"
+                  Margin="10" />
+
+        <!--row 01 -->
+        <Border Grid.Row="01"
+                Grid.Column="00"
+                Grid.ColumnSpan="03"
+                BorderThickness="1"
+                BorderBrush="PaleGreen">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                <TextBlock Text="SEO Rankings "
+                           Margin="10,0" />
+                <ListView  HorizontalContentAlignment="Stretch"
+                           ItemsSource="{Binding Path=RankList, UpdateSourceTrigger=PropertyChanged}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ListViewItem>
+                                <TextBlock Text="{Binding Path=.}"
+                                           Margin="10,0" />
+                            </ListViewItem>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </Border>
+        <!--row 02 -->
+        <DataGrid x:Name="DataDatagrid"
+                  Grid.Row="02"
+                  Grid.ColumnSpan="03"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ItemsSource="{Binding Path=ListData, UpdateSourceTrigger=PropertyChanged}"
+                  CellStyle="{StaticResource PaddedDataGridCell}"
+                  Style="{StaticResource StandardDataGrid}"
+                  ColumnWidth="Auto">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="LightBlue" />
+            </DataGrid.Resources>
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsSmokeBall}"
+                                           Value="True" />
+                                <Condition Binding="{Binding Path=DataContext.SmokeBallOnly, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
+                                           Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Background"
+                                    Value="PaleGreen" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="50">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="SE" />
+                            <TextBlock Text="Rank" />
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=QueryPosition}"
+                                       Padding="2" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="*">
+                    <DataGridTemplateColumn.Header>
+                            <TextBlock Text="Data" TextAlignment="Center" HorizontalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=FoundData}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Padding="2"
+                                       TextAlignment="Left" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="60">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="Smoke" />
+                            <TextBlock Text="Ball ?" />
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=IsSmokeBall}"
+                                       Padding="2" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!--row 03 -->
+        <Button Grid.Row="03"
+                Click="ShutDownButtonClick"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Grid.ColumnSpan="03"
+                Margin="0,0,0,12">
+            <TextBox Text="Exit Application"
+                     Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                     BorderThickness="0" />
+        </Button>
+        
+        <!--rows all -->
+        <Viewbox Height="150"
+                 Grid.Row="00"
+                 Grid.RowSpan="04"
+                 Grid.ColumnSpan="03">
+            <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
+        </Viewbox>
+    </Grid>
+</Window>

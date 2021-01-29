@@ -178,5 +178,15 @@ namespace WpfCeoSeo
                 "SendMessage",
                 this.SingletonGetMessage);
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }

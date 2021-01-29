@@ -45,7 +45,7 @@ completeness of one of the pillars of the MVVM pattern even though it breaks YAG
 
 ###### Frameworks  
 
-All projects are either Net core 3.1 or Net Standard 2.1
+All projects are either Net core 3.1 or Net Standard 2.0
 
 ###### Deployment  
 Right mouse click and selecting **Publish** on the project WpfCeoSeo creates a

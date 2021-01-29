@@ -261,13 +261,14 @@
         </DataGrid>
 
         <!--row 03 -->
-        <Button Grid.Row="03"
+         <Button Grid.Row="03"
                 Click="ShutDownButtonClick"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Grid.ColumnSpan="03"
                 Margin="0,0,0,12">
             <TextBox Text="Exit Application"
+                     PreviewMouseDown="TextBox_PreviewMouseDown"
                      Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
                      BorderThickness="0" />
         </Button>

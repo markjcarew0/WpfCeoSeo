@@ -7,6 +7,7 @@
 // View Model for the Ceo Seo UI MainWindow.xaml
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CeoSeoViewModels
 {
     using CeoSeoCommon;

@@ -8,7 +8,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace WpfCeoSeo
 {
     using CeoSeoViewModels;
@@ -39,7 +38,7 @@ namespace WpfCeoSeo
         /// <summary>
         /// constructor
         /// </summary>
-        public MainWindow(ILogger _logger, IGoogleDataService _googleDataService)
+        public MainWindow(ILogger _logger, IGoogleDataService _googleDataService , IMainWindowViewModel _viewModel)
         {
             try
             {
@@ -52,7 +51,7 @@ namespace WpfCeoSeo
 
                 InitializeComponent();
 
-                this.DataContext = new MainWindowViewModel(this.logger, this.googleDataService);
+                this.DataContext = _viewModel; 
 
                 logger.Write(Serilog.Events.LogEventLevel.Information, "Program started");
                 logger.Information("Just testing");
@@ -177,16 +176,6 @@ namespace WpfCeoSeo
                 Messenger.Singleton,
                 "SendMessage",
                 this.SingletonGetMessage);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TextBox_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Application.Current.Shutdown();
         }
     }
 }

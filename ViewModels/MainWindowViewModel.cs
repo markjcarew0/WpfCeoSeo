@@ -8,7 +8,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CeoSeoViewModels
 {
     using CeoSeoCommon;
@@ -24,8 +23,7 @@ namespace CeoSeoViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
-    //public class MainWindowViewModel : ReactiveObject, IDisposable
-    public class MainWindowViewModel : ViewModelBase, IDisposable
+    public class MainWindowViewModel : ViewModelBase, IDisposable, IMainWindowViewModel
     {
         /// <summary>
         /// google data service to create instances of google data
@@ -74,15 +72,48 @@ namespace CeoSeoViewModels
         /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
-        public MainWindowViewModel(ILogger _logger, IGoogleDataService _googleDataService)
+        public MainWindowViewModel(ILogger _logger, IGoogleDataService _googleDataService, bool unitest = false)
         {
             logger = _logger;
+            logger.Information("MainWindowViewModel open");
+
             googleDataService = _googleDataService;
 
-            logger.Information("MainWindowViewModel open");
             this.SearchSpinnerOn = false;
             this.SmokeBallOnly = false;
 
+            // clear all collections
+            this.SourceData = new List<IGoogleSearchData>();
+            this.ListData = new List<IGoogleSearchData>();
+            this.RankList = new List<int>();
+
+            // listen to UI changes in bound properties
+            SetupReactiveUIObservers();
+
+            // ony initialise the query string if we are not running in a unit test
+            if (unitest)
+            {
+                this.synchronisationContext = TaskScheduler.Current;
+            }
+            else
+            {
+                // If there is no SyncContext for this thread (e.g. we are in a unit test
+                // or console scenario instead of running in an app), then just use the
+                // default scheduler because there is no UI thread to sync with.
+
+                this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
+
+                // initialise the query string to the requirement to search for "conveyancing software"
+                this.QuerySearchString = "conveyancing software";
+            }
+        }
+
+        /// <summary>
+        /// setup reacting to UI changes
+        /// appropriately
+        /// </summary>
+        private void SetupReactiveUIObservers()
+        {
             var scheduler = RxApp.MainThreadScheduler;
 
             // subscribe to 
@@ -97,21 +128,11 @@ namespace CeoSeoViewModels
 
             // subscribe to 
             // creating the data that is bound to the ui view
-            // when the user changes the value vound to the check box
+            // when the user changes the value bound to the check box
             // refresh the data that is in the datagrid accordingly
             this.WhenAnyValue(vm => vm.SmokeBallOnly)
                  .ObserveOn(scheduler)
                  .Subscribe(CreateFilteredListData);
-
-            // clear all collections
-            this.SourceData = new List<IGoogleSearchData>();
-            this.ListData = new List<IGoogleSearchData>();
-            this.RankList = new List<int>();
-
-            this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
-
-            // initialise the query string to the requirement to search for "conveyancing software"
-            this.QuerySearchString = "conveyancing software";
         }
 
         /// <summary>
@@ -239,9 +260,9 @@ namespace CeoSeoViewModels
         ///  get the raw data from the google query
         /// </summary>
         /// <param name="query"></param>
-        private void GetQueryResultData(string query)
+        public void GetQueryResultData(string query)
         {
-            // turn on the spinner wait control showing that earch action is being executed
+            // turn on the spinner wait control showing that query is being resolved
             this.SearchSpinnerOn = true;
 
             try
@@ -263,8 +284,11 @@ namespace CeoSeoViewModels
 
                                 CreateFilteredListData(this.SmokeBallOnly);
 
+                                // turn off the spinner wait control showing that query has been being resolved
                                 this.SearchSpinnerOn = false;
 
+                                // tell the that DataDatagrid it is time to set  focus to the first row
+                                // now that the data from the query has been loaded
                                 Messenger.SendMessageSingleton("SetFocus", "RefreshDataDatagrid", "MainWindow");
                             }
                         },
@@ -281,13 +305,20 @@ namespace CeoSeoViewModels
         /// create the source data from the google query returned results
         /// </summary>
         /// <param name="x"></param>
-        private void CreateSourceData(Task<HtmlNodeCollection> x)
+        public void CreateSourceData(Task<HtmlNodeCollection> x)
+        {
+            var rawNodes = x.Result;
+
+            ProcessRawNodes(rawNodes);
+        }
+
+        public void ProcessRawNodes(HtmlNodeCollection rawNodes)
         {
             var returnNodesData = new List<IGoogleSearchData>();
 
             var positionInList = 0;
 
-            foreach (HtmlNode oneNode in x.Result)
+            foreach (HtmlNode oneNode in rawNodes)
             {
                 var nodeContent = oneNode.InnerText;
                 var newLine = GetGoogleDataInstance();
@@ -315,8 +346,12 @@ namespace CeoSeoViewModels
                     .Where(x => x.IsSmokeBall)
                     .Select(x => x.QueryPosition)
                     .ToList<int>();
-        } 
+        }
 
+        /// <summary>
+        /// retrieve the results from the google query
+        /// </summary>
+        /// <returns></returns>
         private IGoogleSearchData GetGoogleDataInstance()
         {
             var instance = googleDataService.GetGoogleSearchData();

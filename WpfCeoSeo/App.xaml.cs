@@ -18,20 +18,23 @@ namespace WpfCeoSeo
     using System.Windows;
     using DataTransferObjects;
     using System.Windows.Threading;
+    using CeoSeoViewModels;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        static IServiceProvider serviceProvider;
+        private static IServiceProvider serviceProvider;
         ILogger localLogger;
+
+        public static IServiceProvider ServiceProvider { get => serviceProvider; set => serviceProvider = value; }
 
         public App()
         {
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            serviceProvider = services.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
         }
 
         /// <summary>
@@ -40,8 +43,12 @@ namespace WpfCeoSeo
         /// <param name="services"></param>
         private void ConfigureServices(IServiceCollection services)
         {
+            // services.AddSingleton(provider => MainWindowViewModelFactory());
+
             // allows the creation of the main window by Dependency Inversion
             services.AddSingleton<MainWindow>();
+
+            services.AddSingleton(provider => MainWindowViewModelFactory());
 
             // allows the creation of a logger for the application by Dependency Inversion
             localLogger = CreateLogger();
@@ -52,6 +59,15 @@ namespace WpfCeoSeo
         }
 
         /// <summary>
+        /// add a fact
+        /// </summary>
+        /// <returns></returns>
+        private IMainWindowViewModel MainWindowViewModelFactory()
+        {
+            return new MainWindowViewModel(ServiceProvider.GetService<ILogger>(), ServiceProvider.GetService<IGoogleDataService>());
+        }
+
+        /// <summary>
         /// retrieve the startup point for the program from the container
         /// and execute it
         /// </summary>
@@ -59,8 +75,8 @@ namespace WpfCeoSeo
         /// <param name="e"></param>
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            // raise the main windo 
-            var mainWindow = serviceProvider.GetService<MainWindow>();
+            // raise the main window 
+            var mainWindow = ServiceProvider.GetService<MainWindow>();
             mainWindow.Show();
         }
 

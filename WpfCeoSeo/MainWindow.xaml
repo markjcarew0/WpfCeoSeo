@@ -115,18 +115,18 @@
             <Style.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius"
-                            Value="5" />
+                            Value="7" />
                 </Style>
             </Style.Resources>
         </Style>
-        <Style TargetType="TextBox">
+        <!--<Style TargetType="TextBox">
             <Style.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius"
-                            Value="5" />
+                            Value="7" />
                 </Style>
             </Style.Resources>
-        </Style>
+        </Style>-->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -266,15 +266,12 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Grid.ColumnSpan="03"
-                Margin="0,0,0,12">
-            <TextBox Text="Exit Application"
-                     PreviewMouseDown="TextBox_PreviewMouseDown"
-                     IsEnabled="True"
-                     Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
-                     BorderThickness="0" />
+                Content="Exit Application "
+                Margin="5">
         </Button>
         
-        <!--rows all -->
+        <!-- rows all  -->
+        <!-- shows an activity occurring spinner control  -->
         <Viewbox Height="150"
                  Grid.Row="00"
                  Grid.RowSpan="04"

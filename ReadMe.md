@@ -33,15 +33,16 @@ The program uses
 - Serilog for logging   
 - ReactiveUI for observing throttled changes in UI property values  
 - WeakEvent for messaging between layers 
-- HTMLAgilityPack for internet queries
+- HTMLAgilityPack for internet queries  
+- FakeItEasy for stub/mock/fakes in Unit Testing
 
-The unitests are minimal (only one has been written so far)  
-The Messaging functionaity is only used for notifying the UI that the datagrid itemsource 
-should be fully loaded and that an attempt may now be made to set focus to the first line
- of the datagrid
+The unitests are minimal (two have been written so far).  
+WeakEvent Messaging is used to notify the UI layer that the datagrid itemsource 
+is now fully loaded and that keyboard focus should now be set to the first line
+of the datagrid.
 
 The program and class RelayCommand is not currently in use but has been included for 
-completeness of one of the pillars of the MVVM pattern even though it breaks YAGNI    
+MVVM completeness.    
 
 ###### Frameworks  
 
@@ -51,11 +52,11 @@ All projects are either Net core 3.1 or Net Standard 2.0
 Right mouse click and selecting **Publish** on the project WpfCeoSeo creates a
  **single** .EXE **x64 file** in the relative folder location of 
 **\bin\Release\netcoreapp3.1\win-x64\publish**  named **WpfCeoSeo.exe**.  
-Unfortunately its size is 163 Meg and a note of caution is that you should not select 
-the trim option as a publish parameter as it is still experimental and creates a much
- smaller .exe file 
-that does not execute successfully. 
-Zipping ths resulting single .exe file reduces its size to 66 Meg.    
+Its size is 163 Meg - a note of caution is that you should not select 
+the trim option as a publish parameter to produce a smaller .exe file.  
+The trim option is still experimental producing a smaller .exe file that does not, as yet, 
+execute successfully.   
+Zipping ths resulting single .exe file produces an artifact of approx 66 Meg.    
 
 ###### Source control   
 The program solution and project files and all other artifacts are stored in a GitHub repository.  

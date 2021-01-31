@@ -14,7 +14,6 @@ namespace UnitTests
     using FakeItEasy;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Serilog;
-    using System.Threading;
 
     [TestClass]
     public class UnitTestMainWindowModel

@@ -119,14 +119,14 @@
                 </Style>
             </Style.Resources>
         </Style>
-        <!--<Style TargetType="TextBox">
+        <Style TargetType="TextBox">
             <Style.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius"
                             Value="7" />
                 </Style>
             </Style.Resources>
-        </Style>-->
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

@@ -17,6 +17,8 @@ namespace WpfCeoSeo
     using System;
     using System.Windows;
     using System.Windows.Threading;
+    using WpfCeoSeo.Adorners;
+    using WpfCeoSeo.UserControls;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -69,6 +71,11 @@ namespace WpfCeoSeo
         {
             this.Dispose(false);
         }
+
+        /// <summary>
+        ///     Gets or sets the adorner element.
+        /// </summary>
+        public AdornerControl AdornerElement { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether is disposed.
@@ -133,14 +140,15 @@ namespace WpfCeoSeo
         /// </param>
         private void SingletonGetMessage(object sender, MessageEventArgs e)
         {
-            // When this message arrives from the main window viewmodel
-            // we know that the data has been loaded into the itemssource of the datagrid
-            // by the fact that the process in the viewmodel of loading this data is complete.
-            // We cannot use the loaded event for the datagrid
-            // because the items.count of the itemssource will be zero
-            // until the viewmodel has completed its process.
+            
             if (e.MessageFor == "MainWindow")
             {
+                // When this message arrives from the main window viewmodel
+                // we know that the data has been loaded into the itemssource of the datagrid
+                // by the fact that the process in the viewmodel of loading this data is complete.
+                // We cannot use the loaded event for the datagrid
+                // because the items.count of the itemssource will be zero
+                // until the viewmodel has completed its process.
                 if (e.Message == "SetFocus")
                 {
                     var stringContent = e.Content as string;
@@ -150,6 +158,36 @@ namespace WpfCeoSeo
                         {
                             // DispatcherPriority lower than render should ensure items have rendered before we try to focus them
                             this.Dispatcher?.BeginInvoke(new Action(this.SetFocusToDataDatagrid), DispatcherPriority.ContextIdle, null);
+                        }
+                    }
+                }
+                else if (e.Message== "ShowSpinTheDotsInAdorner")
+                {
+                    var spinnerControl = new SpinnerUserControl();
+                    var parentDataGrid = this.DataDatagrid as UIElement;
+                    var adornerControl = new AdornerControl(parentDataGrid, ChildPlacement.Middle) 
+                    {
+                        Child = spinnerControl
+                    };
+                    var adornerLayer = UiUtils.RemoveAdornerElementFromAdorner(parentDataGrid, this.AdornerElement);
+
+                    if (adornerLayer != null)
+                    {
+                        adornerLayer.Add(adornerControl);
+                        this.AdornerElement = adornerControl;
+                    }
+                }
+                else if (e.Message == "CloseSpinTheDotsAdorner")
+                {
+                    if (e.Content is string)
+                    {
+                        var contentString = e.Content.ToString();
+
+                        if (contentString == "Queries")
+                        {
+                            var parentDataGrid = this.DataDatagrid as UIElement;
+                            UiUtils.RemoveAdornerElementFromAdorner(parentDataGrid, this.AdornerElement);
+                            this.DataDatagrid.Focus();
                         }
                     }
                 }

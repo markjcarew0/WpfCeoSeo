@@ -8,6 +8,7 @@
         <SolidColorBrush Color="Green"
                          x:Key="CirclesColor" />
     </UserControl.Resources>
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
     <Viewbox Width="100"
              Height="100"
              HorizontalAlignment="Center"
@@ -103,4 +104,5 @@
             </Canvas>
         </Grid>
     </Viewbox>
+    </StackPanel>
 </UserControl>

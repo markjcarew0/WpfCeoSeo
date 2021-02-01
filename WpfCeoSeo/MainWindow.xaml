@@ -271,12 +271,12 @@
         </Button>
         
         <!-- rows all  -->
-        <!-- shows an activity occurring spinner control  -->
+        <!-- shows an activity occurring spinner control  --><!--
         <Viewbox Height="150"
                  Grid.Row="00"
                  Grid.RowSpan="04"
                  Grid.ColumnSpan="03">
             <wpfceoseo:LoadingWaitView Visibility="{Binding Path=SearchSpinnerOn,  Converter={StaticResource BoolToHiddenVis},UpdateSourceTrigger=PropertyChanged}" />
-        </Viewbox>
+        </Viewbox>-->
     </Grid>
 </Window>

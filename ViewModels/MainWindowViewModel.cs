@@ -22,6 +22,8 @@ namespace CeoSeoViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Threading;
 
     public class MainWindowViewModel : ViewModelBase, IDisposable, IMainWindowViewModel
     {
@@ -264,6 +266,9 @@ namespace CeoSeoViewModels
         {
             // turn on the spinner wait control showing that query is being resolved
             this.SearchSpinnerOn = true;
+            Application.Current.Dispatcher.BeginInvoke(
+                DispatcherPriority.ContextIdle,(
+                Action)(() => Messenger.SendMessageSingleton("ShowSpinTheDotsInAdorner", null, "MainWindow")));
 
             try
             {
@@ -289,6 +294,7 @@ namespace CeoSeoViewModels
 
                                 // tell the that DataDatagrid it is time to set  focus to the first row
                                 // now that the data from the query has been loaded
+                                Messenger.SendMessageSingleton("CloseSpinTheDotsAdorner", "Queries", "MainWindow");
                                 Messenger.SendMessageSingleton("SetFocus", "RefreshDataDatagrid", "MainWindow");
                             }
                         },

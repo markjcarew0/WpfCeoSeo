@@ -11,10 +11,13 @@
 namespace WpfCeoSeo
 {
     using System;
+    using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
+    using System.Windows.Documents;
     using System.Windows.Input;
     using System.Windows.Media;
+    using WpfCeoSeo.Adorners;
 
     public static class UiUtils
     {
@@ -209,6 +212,30 @@ namespace WpfCeoSeo
             }
 
             return child;
+        }
+
+        /// <summary>
+        /// The remove adorner element from adorner.
+        /// </summary>
+        /// <param name="parentUiElement">
+        /// The parent UI element.
+        /// </param>
+        /// <param name="adornerElement">
+        /// The adorner element.
+        /// </param>
+        /// <returns>
+        /// The <see cref="AdornerLayer"/>.
+        /// </returns>
+        public static AdornerLayer RemoveAdornerElementFromAdorner(UIElement parentUiElement, AdornerControl adornerElement)
+        {
+            var adornerLayer = AdornerLayer.GetAdornerLayer(parentUiElement);
+
+            if (adornerElement != null)
+            {
+                adornerLayer?.Remove(adornerElement);
+            }
+
+            return adornerLayer;
         }
     }
 }

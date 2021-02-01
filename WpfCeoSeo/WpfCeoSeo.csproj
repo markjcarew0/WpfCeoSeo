@@ -24,4 +24,8 @@
     <ProjectReference Include="..\ViewModels\CeoSeoViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Adorners\" />
+  </ItemGroup>
+
 </Project>

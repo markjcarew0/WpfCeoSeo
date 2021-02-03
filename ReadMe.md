@@ -44,6 +44,9 @@ of the datagrid.
 The program and class RelayCommand is not currently in use but has been included for 
 MVVM completeness.    
 
+A datagrid control's adornerlayer is used to show a 
+progress spinner while data is being fetched from google   
+
 ###### Frameworks  
 
 All projects are either Net core 3.1 or Net Standard 2.0

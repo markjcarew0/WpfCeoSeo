@@ -151,6 +151,7 @@
                  Grid.Row="00"
                  Grid.Column="01"
                  VerticalContentAlignment="Center"
+                 IsReadOnly="{Binding Path=HideQueryEntryData, UpdateSourceTrigger=PropertyChanged}"
                  Margin="10" />
         <CheckBox IsChecked="{Binding Path=SmokeBallOnly, UpdateSourceTrigger=PropertyChanged}"
                   Grid.Row="00"

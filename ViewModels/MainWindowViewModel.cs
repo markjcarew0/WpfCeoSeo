@@ -66,6 +66,11 @@ namespace CeoSeoViewModels
         private readonly TaskScheduler synchronisationContext;
 
         /// <summary>
+        /// private backing field for HideQueryEntryData
+        /// </summary>
+        private bool hideQueryEntryDataingData; 
+
+        /// <summary>
         /// constructor for MainWindowViewModel
         /// </summary>
         public MainWindowViewModel(ILogger _logger, IGoogleDataService _googleDataService, bool unitest = false)
@@ -75,12 +80,10 @@ namespace CeoSeoViewModels
 
             googleDataService = _googleDataService;
 
-            this.SmokeBallOnly = false;
-
-            // clear all collections
+            // read only initialisation
             this.SourceData = new List<IGoogleSearchData>();
-            this.ListData = new List<IGoogleSearchData>();
-            this.RankList = new List<int>();
+
+            InitialiseVariables();
 
             // listen to UI changes in bound properties
             SetupReactiveUIObservers();
@@ -102,6 +105,21 @@ namespace CeoSeoViewModels
                 // kick off the search
                 this.QuerySearchString = "conveyancing software";
             }
+        }
+
+        /// <summary>
+        /// start off settings for all properties
+        /// </summary>
+        private void InitialiseVariables()
+        {
+            // initially 
+            // we want to all data returned from the query
+            this.SmokeBallOnly = false;
+
+            // clear all collections
+            this.ListData = new List<IGoogleSearchData>();
+            this.RankList = new List<int>();
+            this.HideQueryEntryData = false;
         }
 
         /// <summary>
@@ -172,6 +190,20 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
+        /// this is set to true when data is being loaded via the call to google 
+        /// </summary>
+        public bool HideQueryEntryData
+        {
+            get => hideQueryEntryDataingData;
+
+            set
+            {
+                hideQueryEntryDataingData = value;
+                this.OnPropertyChanged(nameof(this.HideQueryEntryData));
+            }
+        }
+
+        /// <summary>
         /// minimum implementation of IDisposable
         /// </summary>
         public void Dispose()
@@ -185,6 +217,8 @@ namespace CeoSeoViewModels
         /// <param name="rawNodes"></param>
         public async Task ProcessRawNodes(HtmlNodeCollection rawNodes)
         {
+            this.SourceData.Clear();
+
             var returnNodesData = new List<IGoogleSearchData>();
 
             var positionInList = 0;
@@ -200,7 +234,7 @@ namespace CeoSeoViewModels
                 returnNodesData.Add(newLine);
             }
 
-            // turn off the spinner wait control showing that search action is completed
+            // build raw data range
             this.SourceData.AddRange(returnNodesData);
 
             // build up the rank list for smokeball appearances
@@ -215,6 +249,8 @@ namespace CeoSeoViewModels
         {
             try
             {
+                this.HideQueryEntryData = true;
+
                 // turn on the spinner wait control showing that query is being resolved
                 var uiFactory = new TaskFactory(this.synchronisationContext);
                 var task = uiFactory.StartNew(() => Messenger.SendMessageSingleton("ShowSpinTheDotsInAdorner", null, "MainWindow"));
@@ -230,7 +266,7 @@ namespace CeoSeoViewModels
                         {
                             if (x != null)
                             {
-                                this.SourceData.Clear();
+                                // this.SourceData.Clear();
 
                                 await CreateSourceDataAsync(x);
 
@@ -242,6 +278,8 @@ namespace CeoSeoViewModels
                                 // tell the that DataDatagrid it is time to set  focus to the first row
                                 // now that the data from the query has been loaded
                                 Messenger.SendMessageSingleton("SetFocus", "RefreshDataDatagrid", "MainWindow");
+
+                                this.HideQueryEntryData = false;
                             }
                         },
                         this.synchronisationContext)
@@ -294,10 +332,10 @@ namespace CeoSeoViewModels
             // subscribe to 
             // building original data set
             // when the query string is changed after
-            // waiting 350 milliseconds for the user to stop typing
+            // waiting 500 milliseconds for the user to stop typing
             this.WhenAnyValue(vm => vm.QuerySearchString)
             .Where(x => x != null)
-            .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
+            .Throttle(TimeSpan.FromMilliseconds(500), scheduler)
             .ObserveOn(scheduler)
             .Subscribe(FetchGoogleDataAsyncActionBuild());
 

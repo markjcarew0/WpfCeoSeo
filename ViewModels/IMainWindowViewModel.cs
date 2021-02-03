@@ -8,7 +8,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 using DataTransferObjects;
 using System.Collections.Generic;
 
@@ -19,7 +18,6 @@ namespace CeoSeoViewModels
         List<IGoogleSearchData> ListData { get; set; }
         string QuerySearchString { get; set; }
         List<int> RankList { get; set; }
-        bool SearchSpinnerOn { get; set; }
         bool SmokeBallOnly { get; set; }
         List<IGoogleSearchData> SourceData { get; }
 

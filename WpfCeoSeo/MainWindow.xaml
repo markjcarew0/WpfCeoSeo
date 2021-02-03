@@ -8,7 +8,7 @@
         Background="AliceBlue"
         mc:Ignorable="d"
         FontSize="16"
-        Title="Ceo Seo Google Hits = Version 2.0"
+        Title="Ceo Seo Google Hits = Version 3.0"
         WindowStartupLocation="CenterScreen"
         x:Name="MainWindowWindow"
         Height="800"

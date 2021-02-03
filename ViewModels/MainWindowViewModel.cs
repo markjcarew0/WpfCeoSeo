@@ -5,6 +5,8 @@
 // </copyright>
 // <summary>
 // View Model for the Ceo Seo UI MainWindow.xaml
+// version 3.0 attempt to remove the use of .Result from all task code
+// 03 Feb 2021
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +24,6 @@ namespace CeoSeoViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Threading;
 
     public class MainWindowViewModel : ViewModelBase, IDisposable, IMainWindowViewModel
     {
@@ -56,12 +56,6 @@ namespace CeoSeoViewModels
         private List<int> rankList;
 
         /// <summary>
-        /// private backing field
-        /// for public Property SearchSpinnerOn 
-        /// </summary>
-        private bool searchSpinnerOn;
-
-        /// <summary>
         /// show only data that contains the string smokeball
         /// </summary>
         private bool smokeBallOnly;
@@ -81,7 +75,6 @@ namespace CeoSeoViewModels
 
             googleDataService = _googleDataService;
 
-            this.SearchSpinnerOn = false;
             this.SmokeBallOnly = false;
 
             // clear all collections
@@ -106,43 +99,9 @@ namespace CeoSeoViewModels
                 this.synchronisationContext = TaskScheduler.FromCurrentSynchronizationContext();
 
                 // initialise the query string to the requirement to search for "conveyancing software"
+                // kick off the search
                 this.QuerySearchString = "conveyancing software";
             }
-        }
-
-        /// <summary>
-        /// setup reacting to UI changes
-        /// appropriately
-        /// </summary>
-        private void SetupReactiveUIObservers()
-        {
-            var scheduler = RxApp.MainThreadScheduler;
-
-            // subscribe to 
-            // building original data set
-            // when the query string is changed after
-            // waiting 350 milliseconds for the user to stop typing
-            this.WhenAnyValue(vm => vm.QuerySearchString)
-            .Where(x => x != null)
-            .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
-            .ObserveOn(scheduler)
-            .Subscribe(this.GetQueryResultData);
-
-            // subscribe to 
-            // creating the data that is bound to the ui view
-            // when the user changes the value bound to the check box
-            // refresh the data that is in the datagrid accordingly
-            this.WhenAnyValue(vm => vm.SmokeBallOnly)
-                 .ObserveOn(scheduler)
-                 .Subscribe(CreateFilteredListData);
-        }
-
-        /// <summary>
-        ///     Gets the RAW source that was returned from the google query
-        /// </summary>
-        public List<IGoogleSearchData> SourceData
-        {
-            get;
         }
 
         /// <summary>
@@ -177,26 +136,6 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
-        /// property that toggles on and off the visibility of 
-        /// the spinner control 
-        /// that indicates that processing activity is going on
-        /// in retrieving data from google 
-        /// </summary>
-        public bool SearchSpinnerOn
-        {
-            get
-            {
-                return searchSpinnerOn;
-            }
-
-            set
-            {
-                this.searchSpinnerOn = value;
-                this.OnPropertyChanged(nameof(this.SearchSpinnerOn));
-            }
-        }
-
-        /// <summary>
         /// filter to show only smokeball data
         /// </summary>
         public bool SmokeBallOnly
@@ -225,6 +164,14 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
+        ///     Gets the RAW source that was returned from the google query
+        /// </summary>
+        public List<IGoogleSearchData> SourceData
+        {
+            get;
+        }
+
+        /// <summary>
         /// minimum implementation of IDisposable
         /// </summary>
         public void Dispose()
@@ -233,68 +180,67 @@ namespace CeoSeoViewModels
         }
 
         /// <summary>
-        /// create the data list to show
-        /// which is data from SourceData property
-        /// filtered or not as required
+        /// pull apart the HtmlNodeCollection to get the data lines returned
         /// </summary>
-        /// <param name="flterOrNotFilter"></param>
-        private void CreateFilteredListData(bool flterOrNotFilter)
+        /// <param name="rawNodes"></param>
+        public async Task ProcessRawNodes(HtmlNodeCollection rawNodes)
         {
-            if (flterOrNotFilter)
+            var returnNodesData = new List<IGoogleSearchData>();
+
+            var positionInList = 0;
+
+            foreach (HtmlNode oneNode in rawNodes)
             {
-                // only filter when required
-                // showing smokeball data only
-                this.ListData =
-                        this.SourceData
-                        .Where(x => x.IsSmokeBall == flterOrNotFilter)
-                        .ToList();
+                var nodeContent = oneNode.InnerText;
+                var newLine = GetGoogleDataInstance();
+                newLine.FoundData = nodeContent;
+                newLine.IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase);
+                newLine.QueryPosition = ++positionInList;
+
+                returnNodesData.Add(newLine);
             }
-            else
-            {
-                // show all data unfiltered
-                this.ListData =
-                       this.SourceData
-                       .ToList();
-            }
+
+            // turn off the spinner wait control showing that search action is completed
+            this.SourceData.AddRange(returnNodesData);
+
+            // build up the rank list for smokeball appearances
+            await MakeRankListAsync();
         }
 
         /// <summary>
         ///  get the raw data from the google query
         /// </summary>
         /// <param name="query"></param>
-        public void GetQueryResultData(string query)
+        private async Task GetQueryResultDataAsync(string query)
         {
-            // turn on the spinner wait control showing that query is being resolved
-            this.SearchSpinnerOn = true;
-            Application.Current.Dispatcher.BeginInvoke(
-                DispatcherPriority.ContextIdle,(
-                Action)(() => Messenger.SendMessageSingleton("ShowSpinTheDotsInAdorner", null, "MainWindow")));
-
             try
             {
+                // turn on the spinner wait control showing that query is being resolved
+                var uiFactory = new TaskFactory(this.synchronisationContext);
+                var task = uiFactory.StartNew(() => Messenger.SendMessageSingleton("ShowSpinTheDotsInAdorner", null, "MainWindow"));
+
                 // run the search in a task so that we can set the ui 
-                var CancelTask = Task.Run(
-                        () =>
-                        {
-                            return GeneralDataBroker.GetSearchResponse(query);
-                        })
+                await task.ContinueWith(_ =>
+                {
+                    // get the data from the google query
+                    return GeneralDataBroker.GetSearchResponse(query);
+                })
                     .ContinueWith(
-                        x =>
+                        async x =>
                         {
-                            if (x.Result != null)
+                            if (x != null)
                             {
                                 this.SourceData.Clear();
 
-                                CreateSourceData(x);
+                                await CreateSourceDataAsync(x);
 
-                                CreateFilteredListData(this.SmokeBallOnly);
+                                await CreateFilteredListDataAsync(this.SmokeBallOnly);
 
                                 // turn off the spinner wait control showing that query has been being resolved
-                                this.SearchSpinnerOn = false;
+                                Messenger.SendMessageSingleton("CloseSpinTheDotsAdorner", "Queries", "MainWindow");
 
                                 // tell the that DataDatagrid it is time to set  focus to the first row
                                 // now that the data from the query has been loaded
-                                Messenger.SendMessageSingleton("CloseSpinTheDotsAdorner", "Queries", "MainWindow");
                                 Messenger.SendMessageSingleton("SetFocus", "RefreshDataDatagrid", "MainWindow");
                             }
                         },
@@ -311,40 +257,111 @@ namespace CeoSeoViewModels
         /// create the source data from the google query returned results
         /// </summary>
         /// <param name="x"></param>
-        public void CreateSourceData(Task<HtmlNodeCollection> x)
+        private async Task CreateSourceDataAsync(Task<HtmlNodeCollection> x)
         {
-            var rawNodes = x.Result;
+            HtmlNodeCollection nodes = null;
+            var awaitTask = Task.Run(async () =>
+            {
+                nodes = await x;
+                await ProcessRawNodes(nodes);
+            });
 
-            ProcessRawNodes(rawNodes);
+            await awaitTask;
         }
 
-        public void ProcessRawNodes(HtmlNodeCollection rawNodes)
+        /// <summary>
+        /// create the data list to show
+        /// which is data from SourceData property
+        /// filtered or not as required
+        /// </summary>
+        /// <param name="filterOrNotFilter"></param>
+        private async Task CreateFilteredListDataAsync(bool filterOrNotFilter)
         {
-            var returnNodesData = new List<IGoogleSearchData>();
+            List<IGoogleSearchData> theList = FilterTheData(filterOrNotFilter);
 
-            var positionInList = 0;
+            // process the derived list into the list to display
+            await CopyListDataAsync(theList);
+        }
 
-            foreach (HtmlNode oneNode in rawNodes)
+        /// <summary>
+        /// setup reacting to UI changes
+        /// appropriately
+        /// </summary>
+        private void SetupReactiveUIObservers()
+        {
+            var scheduler = RxApp.MainThreadScheduler;
+
+            // subscribe to 
+            // building original data set
+            // when the query string is changed after
+            // waiting 350 milliseconds for the user to stop typing
+            this.WhenAnyValue(vm => vm.QuerySearchString)
+            .Where(x => x != null)
+            .Throttle(TimeSpan.FromMilliseconds(350), scheduler)
+            .ObserveOn(scheduler)
+            .Subscribe(FetchGoogleDataAsyncActionBuild());
+
+            // subscribe to 
+            // creating the data that is bound to the ui view
+            // when the user changes the value bound to the check box
+            // refresh the data that is in the datagrid accordingly
+            this.WhenAnyValue(vm => vm.SmokeBallOnly)
+                    .ObserveOn(scheduler)
+                    .Subscribe(FetchFilteredListDataActionBuild());
+        }
+
+        /// <summary>
+        /// return thr data filtered or not
+        /// </summary>
+        /// <param name="filterOrNotFilter"></param>
+        /// <returns></returns>
+        private List<IGoogleSearchData> FilterTheData(bool filterOrNotFilter)
+        {
+            List<IGoogleSearchData> theList = new List<IGoogleSearchData>();
+            if (filterOrNotFilter)
             {
-                var nodeContent = oneNode.InnerText;
-                var newLine = GetGoogleDataInstance();
-                newLine.FoundData = nodeContent;
-                newLine.IsSmokeBall = nodeContent.Contains("smokeball", StringComparison.OrdinalIgnoreCase);
-                newLine.QueryPosition = ++positionInList;
-
-                returnNodesData.Add(newLine);
+                // only filter when required
+                // showing smokeball data only
+                theList =
+                        this.SourceData
+                        .Where(x => x.IsSmokeBall == filterOrNotFilter)
+                        .ToList();
             }
-            // turn off the spinner wait control showing that search action is completed
-            this.SourceData.AddRange(returnNodesData);
+            else
+            {
+                // show all data unfiltered
+                theList =
+                       this.SourceData
+                       .ToList();
+            }
 
-            // build up the rank list for smokeball appearances
-            MakeRankList();
+            return theList;
+        }
+
+        /// <summary>
+        /// pass the query string to the google query processor
+        /// waiting for it to complete
+        /// </summary>
+        /// <returns></returns>
+        private Action<string> FetchGoogleDataAsyncActionBuild()
+        {
+            return async (x) => await this.GetQueryResultDataAsync(x);
+        }
+
+        /// <summary>
+        /// filter the data
+        /// waiting for it to complete
+        /// </summary>
+        /// <returns></returns>
+        private Action<bool> FetchFilteredListDataActionBuild()
+        {
+            return async (x) => await this.CreateFilteredListDataAsync(x);
         }
 
         /// <summary>
         ///  build up the rank list for smokeball appearances
         /// </summary>
-        private void MakeRankList()
+        private Task MakeRankListAsync()
         {
             this.RankList.Clear();
             this.RankList =
@@ -352,6 +369,19 @@ namespace CeoSeoViewModels
                     .Where(x => x.IsSmokeBall)
                     .Select(x => x.QueryPosition)
                     .ToList<int>();
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// build up the List Data for dispaly by the UI
+        /// </summary>
+        /// <param name="theList"></param>
+        /// <returns></returns>
+        private Task CopyListDataAsync(List<IGoogleSearchData> theList)
+        {
+            this.ListData = theList;
+            return Task.CompletedTask;
         }
 
         /// <summary>

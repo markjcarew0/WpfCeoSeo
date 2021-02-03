@@ -14,6 +14,7 @@ namespace UnitTests
     using FakeItEasy;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Serilog;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class UnitTestMainWindowModel
@@ -41,7 +42,13 @@ namespace UnitTests
 
             var rawNodes = GeneralDataBroker.GetSearchResponse("Brown Cow");
 
-            viewModel.ProcessRawNodes(rawNodes);
+            var awaitTask = Task.Run(async () =>
+            {
+                await viewModel.ProcessRawNodes(rawNodes);
+            });
+
+            // unittest - break the rules 
+            awaitTask.GetAwaiter().GetResult();
 
             // there should be some brow cow entries
             Assert.IsTrue(viewModel.SourceData.Count > 0);
